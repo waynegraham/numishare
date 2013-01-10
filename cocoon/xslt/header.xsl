@@ -5,7 +5,7 @@
 
 		<!-- if displaying a coin or artifact record, the path to the other sections should be {$display_path} ; otherwise nothing -->
 		<div id="hd">
-			<div class="banner align-right">
+			<div class="banner align-right ui-widget-content" style="border:0">
 				<xsl:if test="string(/content/config/banner_text)">
 					<div class="banner_text">
 						<xsl:value-of select="/content/config/banner_text"/>

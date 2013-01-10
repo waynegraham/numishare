@@ -78,43 +78,19 @@
 							</xsl:if>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:if test="str[@name='obv_leg_display']">
+							<xsl:if test="string(str[@name='date_display'])">
 								<div>
-									<dt><xsl:value-of select="numishare:regularize_node('obverse', $lang)"/>:</dt>
+									<dt><xsl:value-of select="numishare:regularize_node('date', $lang)"/>:</dt>
 									<dd style="margin-left:150px;">
-										<xsl:value-of select="str[@name='obv_leg_display']"/>
+										<xsl:value-of select="str[@name='date_display']"/>
 									</dd>
 								</div>
 							</xsl:if>
-							<xsl:if test="str[@name='rev_leg_display']">
+							<xsl:if test="string(arr[@name='denomination_facet']/str[1])">
 								<div>
-									<dt><xsl:value-of select="numishare:regularize_node('reverse', $lang)"/>:</dt>
+									<dt><xsl:value-of select="numishare:regularize_node('denomination', $lang)"/>:</dt>
 									<dd style="margin-left:150px;">
-										<xsl:value-of select="str[@name='rev_leg_display']"/>
-									</dd>
-								</div>
-							</xsl:if>
-							<xsl:if test="float[@name='diameter_num']">
-								<div>
-									<dt><xsl:value-of select="numishare:regularize_node('diameter', $lang)"/>: </dt>
-									<dd style="margin-left:150px;">
-										<xsl:value-of select="float[@name='diameter_num']"/>
-									</dd>
-								</div>
-							</xsl:if>
-							<xsl:if test="float[@name='weight_num']">
-								<div>
-									<dt><xsl:value-of select="numishare:regularize_node('weight', $lang)"/>: </dt>
-									<dd style="margin-left:150px;">
-										<xsl:value-of select="float[@name='weight_num']"/>
-									</dd>
-								</div>
-							</xsl:if>
-							<xsl:if test="arr[@name='reference_facet']">
-								<div>
-									<dt><xsl:value-of select="numishare:regularize_node('reference', $lang)"/>: </dt>
-									<dd style="margin-left:150px;">
-										<xsl:for-each select="arr[@name='reference_facet']/str">
+										<xsl:for-each select="arr[@name='denomination_facet']/str">
 											<xsl:value-of select="."/>
 											<xsl:if test="not(position() = last())">
 												<xsl:text>, </xsl:text>
@@ -123,6 +99,43 @@
 									</dd>
 								</div>
 							</xsl:if>
+							<xsl:if test="string(arr[@name='mint_facet']/str[1])">
+								<div>
+									<dt><xsl:value-of select="numishare:regularize_node('mint', $lang)"/>:</dt>
+									<dd style="margin-left:150px;">
+										<xsl:for-each select="arr[@name='mint_facet']/str">
+											<xsl:value-of select="."/>
+											<xsl:if test="not(position() = last())">
+												<xsl:text>, </xsl:text>
+											</xsl:if>
+										</xsl:for-each>
+									</dd>
+								</div>
+							</xsl:if>
+							<xsl:if test="str[@name='obv_leg_display'] or str[@name='obv_type_display']">
+								<div>
+									<dt><xsl:value-of select="numishare:regularize_node('obverse', $lang)"/>:</dt>
+									<dd style="margin-left:150px;">
+										<xsl:value-of select="str[@name='obv_leg_display']"/>
+										<xsl:if test="str[@name='obv_leg_display'] and str[@name='obv_type_display']">
+											<xsl:text>: </xsl:text>
+										</xsl:if>
+										<xsl:value-of select="str[@name='obv_leg_display']"/>
+									</dd>
+								</div>
+							</xsl:if>
+							<xsl:if test="str[@name='rev_leg_display'] or str[@name='rev_type_display']">
+								<div>
+									<dt><xsl:value-of select="numishare:regularize_node('reverse', $lang)"/>:</dt>
+									<dd style="margin-left:150px;">
+										<xsl:value-of select="str[@name='rev_leg_display']"/>
+										<xsl:if test="str[@name='rev_leg_display'] and str[@name='rev_type_display']">
+											<xsl:text>: </xsl:text>
+										</xsl:if>
+										<xsl:value-of select="str[@name='rev_leg_display']"/>
+									</dd>
+								</div>
+							</xsl:if>							
 						</xsl:otherwise>
 					</xsl:choose>
 
