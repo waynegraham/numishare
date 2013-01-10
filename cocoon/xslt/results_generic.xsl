@@ -120,7 +120,7 @@
 										<xsl:if test="str[@name='obv_leg_display'] and str[@name='obv_type_display']">
 											<xsl:text>: </xsl:text>
 										</xsl:if>
-										<xsl:value-of select="str[@name='obv_leg_display']"/>
+										<xsl:value-of select="str[@name='obv_type_display']"/>
 									</dd>
 								</div>
 							</xsl:if>
@@ -132,7 +132,7 @@
 										<xsl:if test="str[@name='rev_leg_display'] and str[@name='rev_type_display']">
 											<xsl:text>: </xsl:text>
 										</xsl:if>
-										<xsl:value-of select="str[@name='rev_leg_display']"/>
+										<xsl:value-of select="str[@name='rev_type_display']"/>
 									</dd>
 								</div>
 							</xsl:if>							
