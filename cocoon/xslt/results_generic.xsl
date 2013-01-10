@@ -8,9 +8,9 @@
 			<xsl:value-of select="numishare:normalize_fields($sort_category, $lang)"/>
 		</xsl:variable>
 		<xsl:variable name="collection" select="substring-before(str[@name='identifier_display'], '.')"/>
+		<xsl:variable name="row" select="if (position() mod 2 = 0) then 'even-row' else 'odd-row'"/>
 
-
-		<tr class="result_doc">
+		<tr class="result_doc {$row}">
 			<xsl:if test="not($mode='compare') and //config/theme/layouts/*[name()=$pipeline]/image_location = 'left'">
 				<xsl:call-template name="result_image">
 					<xsl:with-param name="alignment">left</xsl:with-param>
@@ -384,7 +384,7 @@
 				<xsl:when test="str[@name='recordType'] = 'conceptual'">
 					<xsl:choose>
 						<xsl:when test="string($sparql_endpoint)">
-							<cinclude:include src="cocoon:/widget?uri={$url}id/{str[@name='id']}&amp;template=results"/>
+							<cinclude:include src="cocoon:/widget?uri=http://numismatics.org/ocre/id/{str[@name='id']}&amp;template=results"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:variable name="count" select="count(arr[@name='ao_uri']/str)"/>

@@ -75,7 +75,7 @@
 						<!-- show associated objects, preferencing those from Metis first -->
 						<xsl:choose>
 							<xsl:when test="string($sparql_endpoint)">
-								<cinclude:include src="cocoon:/widget?uri={concat($url, 'id/', $id)}&amp;template=display"/>
+								<cinclude:include src="cocoon:/widget?uri={concat('http://numismatics.org/ocre/', 'id/', $id)}&amp;template=display"/>
 							</xsl:when>
 							<xsl:when test="count(nuds:digRep/nuds:associatedObject) &gt; 0">
 								<div class="objects">

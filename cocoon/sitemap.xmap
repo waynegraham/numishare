@@ -104,8 +104,8 @@
 				<!-- static variables, referred to as generate calls in pipelines.  
 					These only need to be changed if Solr and Orbeon are run on a different server or Tomcat application than Cocoon -->
 				<solr-url>http://localhost:8080/solr/numishare-published/</solr-url>
-				<exist-url>http://localhost:8080/orbeon/exist/rest/db/</exist-url>
-				<collection-name>numishare</collection-name>
+				<exist-url>http://localhost:8080/exist/rest/db/</exist-url>
+				<collection-name>ocre</collection-name>
 			</global-variables>
 		</map:component-configurations>
 
@@ -221,7 +221,9 @@
 				</map:aggregate>
 				<map:transform src="xslt/geographic/object-to-kml.xsl" label="basiccontent" type="xslt-saxon">
 					<map:parameter name="use-request-parameters" value="true"/>
+					<map:parameter name="id" value="{1}"/>
 				</map:transform>
+				<map:transform type="cinclude"/>
 				<map:serialize type="xml"/>
 			</map:match>
 
