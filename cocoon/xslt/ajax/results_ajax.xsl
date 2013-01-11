@@ -95,8 +95,13 @@
 										<xsl:text>: </xsl:text>
 									</xsl:if>
 									<xsl:value-of
+<<<<<<< HEAD
 										select="if (string-length(str[@name='rev_type_display']) &gt; 30) then concat(substring(str[@name='rev_type_display'], 1, 30), '...') else str[@name='rev_type_display']"/>
 
+=======
+										select="if (string-length(str[@name='rev_type_display']) &gt; 30) then concat(substring(str[@name='rev_type_display'], 1, 30), '...') else str[@name='rev_type_display']"
+									/>
+>>>>>>> master
 								</dd>
 							</div>
 						</xsl:if>
