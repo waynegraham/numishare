@@ -173,7 +173,7 @@
 									</dd>
 								</div>
 							</xsl:when>
-							<xsl:when test="contains($sort, '_facet') or contains($sort, 'reference_facet') or contains($sort, 'prevcoll_display')">
+							<xsl:when test="contains($sort, '_facet') or contains($sort, 'reference_facet') or contains($sort, 'provenance_facet')">
 								<div>
 									<xsl:choose>
 										<xsl:when test="matches($sort, 'objectType_facet')">
