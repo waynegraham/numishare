@@ -77,7 +77,7 @@
 								</div>
 							</xsl:if>
 						</xsl:when>
-						<xsl:otherwise>							
+						<xsl:otherwise>
 							<xsl:if test="string(str[@name='date_display'])">
 								<div>
 									<dt><xsl:value-of select="numishare:regularize_node('date', $lang)"/>:</dt>
@@ -135,7 +135,7 @@
 										<xsl:value-of select="str[@name='rev_type_display']"/>
 									</dd>
 								</div>
-							</xsl:if>							
+							</xsl:if>
 						</xsl:otherwise>
 					</xsl:choose>
 
@@ -449,17 +449,11 @@
 				<xsl:when test="$q = '*:*'">
 					<h1>
 						<xsl:value-of select="numishare:normalizeLabel('results_all-terms', $lang)"/>
-						<xsl:if test="//lst[@name='mint_geo']/int[@name='numFacetTerms'] &gt; 0">
-							<a href="#resultMap" id="map_results">
-								<xsl:value-of select="numishare:normalizeLabel('results_map-results', $lang)"/>
-							</a>
-						</xsl:if>
 					</h1>
 				</xsl:when>
 				<xsl:otherwise>
-					<h1><xsl:value-of select="numishare:normalizeLabel('results_filters', $lang)"/> <xsl:if test="//lst[@name='mint_geo']/int[@name='numFacetTerms'] &gt; 0">
-							<a href="#resultMap" id="map_results"><xsl:value-of select="numishare:normalizeLabel('results_map-results', $lang)"/></a>
-						</xsl:if>
+					<h1>
+						<xsl:value-of select="numishare:normalizeLabel('results_filters', $lang)"/>
 					</h1>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -485,7 +479,9 @@
 								<xsl:when test="string($field)">
 									<xsl:value-of select="numishare:normalize_fields($field, $lang)"/>
 								</xsl:when>
-								<xsl:otherwise><xsl:value-of select="numishare:normalize_fields('fulltext', $lang)"/></xsl:otherwise>
+								<xsl:otherwise>
+									<xsl:value-of select="numishare:normalize_fields('fulltext', $lang)"/>
+								</xsl:otherwise>
 							</xsl:choose>
 						</xsl:variable>
 						<xsl:variable name="term">
@@ -656,7 +652,10 @@
 								<xsl:choose>
 									<xsl:when test="$lang='ar'">
 										<xsl:value-of select="."/>
-										<b><xsl:text> :</xsl:text> <xsl:value-of select="numishare:normalize_fields('fulltext', $lang)"/></b>
+										<b>
+											<xsl:text> :</xsl:text>
+											<xsl:value-of select="numishare:normalize_fields('fulltext', $lang)"/>
+										</b>
 									</xsl:when>
 									<xsl:otherwise>
 										<b><xsl:value-of select="numishare:normalize_fields('fulltext', $lang)"/>: </b>
