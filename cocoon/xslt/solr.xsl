@@ -18,6 +18,7 @@
 		<xsl:text>http://api.geonames.org</xsl:text>
 	</xsl:variable>
 	<xsl:variable name="geonames_api_key" select="/content/config/geonames_api_key"/>
+	<xsl:variable name="sparql_endpoint" select="/content/config/sparql_endpoint"/>
 	<xsl:variable name="publisher" select="/content/config/template/publisher"/>
 
 	<xsl:variable name="nudsGroup">
@@ -115,8 +116,6 @@
 	</xsl:template>
 
 	<xsl:template match="/">
-		
-		
 		<add>
 			<xsl:choose>
 				<xsl:when test="count(descendant::nuds:nuds) &gt; 0">

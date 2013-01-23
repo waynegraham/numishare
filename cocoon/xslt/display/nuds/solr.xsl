@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0" xmlns:nuds="http://nomisma.org/nuds" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:datetime="http://exslt.org/dates-and-times"
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exsl="http://exslt.org/common" xmlns:mets="http://www.loc.gov/METS/"
-	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gml="http://www.opengis.net/gml/" xmlns:skos="http://www.w3.org/2004/02/skos/core#" exclude-result-prefixes="#all">
-
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gml="http://www.opengis.net/gml/" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:cinclude="http://apache.org/cocoon/include/1.0"
+	exclude-result-prefixes="#all">
 
 	<xsl:template name="nuds">
 		<xsl:apply-templates select="//nuds:nuds"/>
 	</xsl:template>
 
 	<xsl:template match="nuds:nuds">
+		<xsl:variable name="id" select="nuds:nudsHeader/nuds:nudsid"/>
+		
 		<doc>
 			<field name="id">
-				<xsl:value-of select="nuds:nudsHeader/nuds:nudsid"/>
+				<xsl:value-of select="$id"/>
 			</field>
+			<xsl:if test="$collection-name = 'ocre'">
+				<xsl:call-template name="sortid"/>
+			</xsl:if>
 			<field name="collection-name">
 				<xsl:value-of select="$collection-name"/>
 			</field>
@@ -38,7 +43,14 @@
 			</xsl:for-each>
 
 			<xsl:apply-templates select="nuds:descMeta"/>
-			<xsl:apply-templates select="nuds:digRep"/>
+			<xsl:choose>
+				<xsl:when test="string($sparql_endpoint)">
+					<cinclude:include src="cocoon:/widget?uri={concat('http://numismatics.org/ocre/', 'id/', $id)}&amp;template=solr"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates select="nuds:digRep"/>
+				</xsl:otherwise>
+			</xsl:choose>
 		</doc>
 	</xsl:template>
 
@@ -341,6 +353,79 @@
 				<xsl:value-of select="."/>
 			</field>
 		</xsl:if>
+	</xsl:template>
+
+	<xsl:template name="sortid">
+		<field name="sortid">
+			<xsl:variable name="segs" select="tokenize(nuds:nudsHeader/nuds:nudsid, '\.')"/>
+			<xsl:variable name="auth">
+				<xsl:choose>
+					<xsl:when test="$segs[3] = 'aug'">01</xsl:when>
+					<xsl:when test="$segs[3] = 'tib'">02</xsl:when>
+					<xsl:when test="$segs[3] = 'gai'">03</xsl:when>
+					<xsl:when test="$segs[3] = 'cl'">04</xsl:when>
+					<xsl:when test="$segs[3] = 'ner'">
+						<xsl:choose>
+							<xsl:when test="$segs[2]='1(2)'">05</xsl:when>
+							<xsl:when test="$segs[2]='2'">15</xsl:when>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:when test="$segs[3] = 'clm'">06</xsl:when>
+					<xsl:when test="$segs[3] = 'cw'">07</xsl:when>
+					<xsl:when test="$segs[3] = 'gal'">08</xsl:when>
+					<xsl:when test="$segs[3] = 'ot'">09</xsl:when>
+					<xsl:when test="$segs[3] = 'vit'">10</xsl:when>
+					<xsl:when test="$segs[3] = 'ves'">11</xsl:when>
+					<xsl:when test="$segs[3] = 'tit'">12</xsl:when>
+					<xsl:when test="$segs[3] = 'dom'">13</xsl:when>
+					<xsl:when test="$segs[3] = 'anys'">14</xsl:when>
+					<xsl:when test="$segs[3] = 'tr'">16</xsl:when>
+					<xsl:when test="$segs[3] = 'hdn'">17</xsl:when>
+					<xsl:when test="$segs[3] = 'ant'">18</xsl:when>
+				</xsl:choose>
+			</xsl:variable>
+			<xsl:variable name="num">
+				<xsl:choose>
+					<xsl:when test="lower-case(substring($segs[4], string-length($segs[4]), 1)) = 'a'">
+						<xsl:value-of select="format-number(number(substring($segs[4], 1, string-length($segs[4]) - 1)), '0000')"/>
+						<xsl:text>.1</xsl:text>
+					</xsl:when>
+					<xsl:when test="lower-case(substring($segs[4], string-length($segs[4]), 1)) = 'b'">
+						<xsl:value-of select="format-number(number(substring($segs[4], 1, string-length($segs[4]) - 1)), '0000')"/>
+						<xsl:text>.2</xsl:text>
+					</xsl:when>
+					<xsl:when test="lower-case(substring($segs[4], string-length($segs[4]), 1)) = 'c'">
+						<xsl:value-of select="format-number(number(substring($segs[4], 1, string-length($segs[4]) - 1)), '0000')"/>
+						<xsl:text>.3</xsl:text>
+					</xsl:when>
+					<xsl:when test="lower-case(substring($segs[4], string-length($segs[4]), 1)) = 'd'">
+						<xsl:value-of select="format-number(number(substring($segs[4], 1, string-length($segs[4]) - 1)), '0000')"/>
+						<xsl:text>.4</xsl:text>
+					</xsl:when>
+					<xsl:when test="lower-case(substring($segs[4], string-length($segs[4]), 1)) = 'e'">
+						<xsl:value-of select="format-number(number(substring($segs[4], 1, string-length($segs[4]) - 1)), '0000')"/>
+						<xsl:text>.5</xsl:text>
+					</xsl:when>
+					<xsl:when test="lower-case(substring($segs[4], string-length($segs[4]), 1)) = 'f'">
+						<xsl:value-of select="format-number(number(substring($segs[4], 1, string-length($segs[4]) - 1)), '0000')"/>
+						<xsl:text>.6</xsl:text>
+					</xsl:when>
+					<xsl:when test="lower-case(substring($segs[4], string-length($segs[4]), 1)) = 'g'">
+						<xsl:value-of select="format-number(number(substring($segs[4], 1, string-length($segs[4]) - 1)), '0000')"/>
+						<xsl:text>.7</xsl:text>
+					</xsl:when>
+					<xsl:when test="lower-case(substring($segs[4], string-length($segs[4]), 1)) = 'h'">
+						<xsl:value-of select="format-number(number(substring($segs[4], 1, string-length($segs[4]) - 1)), '0000')"/>
+						<xsl:text>.8</xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="format-number(number($segs[4]), '0000')"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+
+			<xsl:value-of select="concat($segs[1], '.', $segs[2], '.', $auth, '.', $num)"/>
+		</field>
 	</xsl:template>
 
 </xsl:stylesheet>

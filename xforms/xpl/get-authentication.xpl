@@ -28,6 +28,7 @@
 				<role>egypt</role>
 				<role>uva</role>
 				<role>electrum</role>
+				<role>ocre</role>
 			</config>
 		</p:input>
 		<p:output name="data" ref="data"/>
