@@ -77,7 +77,7 @@
 								</div>
 							</xsl:if>
 						</xsl:when>
-						<xsl:otherwise>
+						<xsl:otherwise>							
 							<xsl:if test="string(str[@name='date_display'])">
 								<div>
 									<dt><xsl:value-of select="numishare:regularize_node('date', $lang)"/>:</dt>
