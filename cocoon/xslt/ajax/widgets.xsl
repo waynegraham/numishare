@@ -136,7 +136,7 @@ for example pulling data from the coin-type triplestore and SPARQL endpoint, Met
 			OPTIONAL { ?annotation nm:reverseReference ?revRef }
 			OPTIONAL { ?annotation nm:findspot ?findspot }
 			OPTIONAL { ?annotation nm:numismatic_term ?numismatic_term }}
-			ORDER BY ASC(?publisher)]]>]]>
+			ORDER BY ASC(?publisher)]]>
 		</xsl:variable>
 		<xsl:variable name="service" select="concat($endpoint, '?query=', encode-for-uri(normalize-space(replace($query, 'typeUri', $uri))), '&amp;output=xml')"/>
 
