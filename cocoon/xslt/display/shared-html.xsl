@@ -289,19 +289,20 @@
 	</xsl:template>
 	<!--***************************************** OPTIONS BAR **************************************** -->
 	<xsl:template name="icons">
-
-		<div class="submenu">
-			<div class="icon">
-				<a href="{$id}.xml">
-					<img src="{$display_path}images/xml.png" title="XML" alt="XML"/>
-				</a>
+		<div class="yui3-u-1">
+			<div class="submenu">
+				<div class="icon">
+					<a href="{$id}.xml">
+						<img src="{$display_path}images/xml.png" title="XML" alt="XML"/>
+					</a>
+				</div>
+				<div class="icon">
+					<a href="{$id}.rdf">
+						<img src="{$display_path}images/rdf.gif" title="RDF" alt="RDF"/>
+					</a>
+				</div>
+				<div class="icon">AddThis could go here...</div>
 			</div>
-			<div class="icon">
-				<a href="{$id}.rdf">
-					<img src="{$display_path}images/rdf.gif" title="RDF" alt="RDF"/>
-				</a>
-			</div>
-			<div class="icon">AddThis could go here...</div>
 		</div>
 	</xsl:template>
 

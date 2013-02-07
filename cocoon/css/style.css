@@ -7,6 +7,20 @@
   GLOBAL
   ***************************************
  */
+html {
+	background-color:#3383BB;
+}
+body {
+	margin:auto;
+	width:972px;
+	border:1px solid gray;
+	margin-top:10px;
+	background-color:white;
+	font:14px palatino, serif;
+}
+.content {
+	padding:5px;
+}
 a > img {
 	border:none;
 }
@@ -35,20 +49,9 @@ select {
 ol li, ul li, dl li {
 	list-style-type:none;
 }
-html {
-	background-color:#3383BB;
-}
-#bd {
-	padding:5px;
-	background-color:white;
-	font:14px palatino, serif;
-}
-#doc4 {
-	border-top: 1px solid gray;
-	border-left: 1px solid gray;
-	border-right: 1px solid #555555;
-	border-bottom: 1px solid #555555;
-	color: #333333;
+h4 {
+	margin:0;
+	padding:0;
 }
 .ui-widget-header {
 	border-left:0;
@@ -649,10 +652,10 @@ div.custominfostyle {
 	color:black;
 	font-size:12px;
 }
- .pagingBtn:hover{
- 	/*width:100%;*/
- 	text-decoration:underline;
- }
+.pagingBtn:hover {
+/* width:100%; */
+	text-decoration:underline;
+}
 /*
   ****************************************
   FEATURES/LINKED DATA SECTION

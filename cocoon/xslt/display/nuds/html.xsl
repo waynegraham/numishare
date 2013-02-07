@@ -2,7 +2,7 @@
 <?cocoon-disable-caching?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mets="http://www.loc.gov/METS/"
 	xmlns:exsl="http://exslt.org/common" xmlns:numishare="http://code.google.com/p/numishare/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:skos="http://www.w3.org/2004/02/skos/core#"
-	xmlns:cinclude="http://apache.org/cocoon/include/1.0" xmlns:nuds="http://nomisma.org/nuds" exclude-result-prefixes="xs xlink mets exsl numishare xsl skos xlink cinclude" version="2.0">
+	xmlns:cinclude="http://apache.org/cocoon/include/1.0" xmlns:nuds="http://nomisma.org/nuds" exclude-result-prefixes="#all" version="2.0">
 
 	<xsl:param name="q"/>
 	<xsl:param name="weightQuery"/>
@@ -47,111 +47,125 @@
 		<!-- below is a series of conditionals for forming the image boxes and displaying obverse and reverse images, iconography, and legends if they are available within the EAD document -->
 		<xsl:choose>
 			<xsl:when test="not($mode = 'compare')">
-				<!-- determine whether the document has published findspots or associated object findspots -->
-				<script type="text/javascript" langage="javascript">
-                                                        $(function () {
-                                                                $("#tabs").tabs({
-                                                                        show: function (event, ui) {
-                                                                                if (ui.panel.id == "mapTab" &amp;&amp; $('#mapcontainer').html().length == 0) {
-                                                                                        $('#mapcontainer').html('');
-                                                                                        initialize_map('<xsl:value-of select="$id"/>', '<xsl:value-of select="$display_path"/>');
-                                                                                }
-                                                                        }
-                                                                });
-                                                        });
-                                                </script>
-				<xsl:if test="$has_mint_geo = 'true' or $has_findspot_geo = 'true'">
-					<script type="text/javascript" src="http://www.openlayers.org/api/OpenLayers.js"/>
-					<script type="text/javascript" src="http://maps.google.com/maps/api/js?v=3.2&amp;sensor=false"/>
-					<script type="text/javascript" src="{$display_path}javascript/display_map_functions.js"/>
-				</xsl:if>
 				<xsl:call-template name="icons"/>
 				<xsl:choose>
 					<xsl:when test="$recordType='conceptual'">
-						<h1 id="object_title">
-							<xsl:value-of select="normalize-space(nuds:descMeta/nuds:title)"/>
-						</h1>
-						<xsl:call-template name="nuds_content"/>
+						<div class="yui3-u-1">
+							<div class="content">
+								<h1 id="object_title">
+									<xsl:value-of select="normalize-space(nuds:descMeta/nuds:title)"/>
+								</h1>
+								<xsl:call-template name="nuds_content"/>
 
-						<!-- show associated objects, preferencing those from Metis first -->
-						<xsl:choose>
-							<xsl:when test="string($sparql_endpoint)">
-								<cinclude:include src="cocoon:/widget?uri={concat('http://numismatics.org/ocre/', 'id/', $id)}&amp;template=display"/>
-							</xsl:when>
-							<xsl:when test="count(nuds:digRep/nuds:associatedObject) &gt; 0">
-								<div class="objects">
-									<h2>Examples of this type</h2>
-									<xsl:apply-templates select="nuds:digRep/nuds:associatedObject"/>
-								</div>
-							</xsl:when>
-						</xsl:choose>
+								<!-- show associated objects, preferencing those from Metis first -->
+								<xsl:choose>
+									<xsl:when test="string($sparql_endpoint)">
+										<cinclude:include src="cocoon:/widget?uri={concat('http://numismatics.org/ocre/', 'id/', $id)}&amp;template=display"/>
+									</xsl:when>
+									<xsl:when test="count(nuds:digRep/nuds:associatedObject) &gt; 0">
+										<div class="objects">
+											<h2>Examples of this type</h2>
+											<xsl:apply-templates select="nuds:digRep/nuds:associatedObject"/>
+										</div>
+									</xsl:when>
+								</xsl:choose>
+							</div>
+						</div>
 					</xsl:when>
 					<xsl:when test="$recordType='physical'">
 						<xsl:choose>
 							<xsl:when test="$orientation = 'vertical'">
-								<div class="yui-g">
-									<div class="yui-u first">
-										<xsl:choose>
-											<xsl:when test="$image_location = 'left'">
-												<xsl:call-template name="obverse_image"/>
-												<xsl:call-template name="reverse_image"/>
-											</xsl:when>
-											<xsl:when test="$image_location = 'right'">
-												<h1 id="object_title">
-													<xsl:value-of select="normalize-space(nuds:descMeta/nuds:title)"/>
-												</h1>
-												<xsl:call-template name="nuds_content"/>
-											</xsl:when>
-										</xsl:choose>
-									</div>
-									<div class="yui-u">
-										<xsl:choose>
-											<xsl:when test="$image_location = 'left'">
-												<h1 id="object_title">
-													<xsl:value-of select="normalize-space(nuds:descMeta/nuds:title)"/>
-												</h1>
-												<xsl:call-template name="nuds_content"/>
-											</xsl:when>
-											<xsl:when test="$image_location = 'right'">
-												<xsl:call-template name="obverse_image"/>
-												<xsl:call-template name="reverse_image"/>
-											</xsl:when>
-										</xsl:choose>
+								<div class="yui3-u-1">
+									<div class="content">
+										<h1 id="object_title">
+											<xsl:value-of select="normalize-space(nuds:descMeta/nuds:title)"/>
+										</h1>
 									</div>
 								</div>
-							</xsl:when>
-							<xsl:when test="$orientation = 'horizontal'">
-								<h1 id="object_title">
-									<xsl:value-of select="normalize-space(nuds:descMeta/nuds:title)"/>
-								</h1>
+
 								<xsl:choose>
-									<xsl:when test="$image_location = 'top'">
-										<div class="yui-g">
-											<div class="yui-u first">
+									<xsl:when test="$image_location = 'left'">
+										<div class="yui3-u-5-12">
+											<div class="content">
 												<xsl:call-template name="obverse_image"/>
-											</div>
-											<div class="yui-u">
 												<xsl:call-template name="reverse_image"/>
 											</div>
 										</div>
-										<div>
-											<xsl:call-template name="nuds_content"/>
+									</xsl:when>
+									<xsl:when test="$image_location = 'right'">
+										<div class="yui3-u-7-12">
+											<div class="content">
+												<xsl:call-template name="nuds_content"/>
+											</div>
 										</div>
 									</xsl:when>
-									<xsl:when test="$image_location = 'bottom'">
-										<div>
-											<xsl:call-template name="nuds_content"/>
-										</div>
-										<div class="yui-g">
-											<div class="yui-u first">
-												<xsl:call-template name="obverse_image"/>
+								</xsl:choose>
+
+								<xsl:choose>
+									<xsl:when test="$image_location = 'left'">
+										<div class="yui3-u-7-12">
+											<div class="content">
+												<xsl:call-template name="nuds_content"/>
 											</div>
-											<div class="yui-u">
+										</div>
+									</xsl:when>
+									<xsl:when test="$image_location = 'right'">
+										<div class="yui3-u-5-12">
+											<div class="content">
+												<xsl:call-template name="obverse_image"/>
 												<xsl:call-template name="reverse_image"/>
 											</div>
 										</div>
 									</xsl:when>
 								</xsl:choose>
+							</xsl:when>
+							<xsl:when test="$orientation = 'horizontal'">
+								<div class="content">
+									<div class="yui3-u-1">
+										<div class="content">
+											<h1 id="object_title">
+												<xsl:value-of select="normalize-space(nuds:descMeta/nuds:title)"/>
+											</h1>
+										</div>
+									</div>
+
+									<xsl:choose>
+										<xsl:when test="$image_location = 'top'">
+											<div class="yui3-u-1-2">
+												<div class="content">
+													<xsl:call-template name="obverse_image"/>
+												</div>
+											</div>
+											<div class="yui3-u-1-2">
+												<div class="content">
+													<xsl:call-template name="reverse_image"/>
+												</div>
+											</div>
+											<div class="yui3-u-1">
+												<div class="content">
+													<xsl:call-template name="nuds_content"/>
+												</div>
+											</div>
+										</xsl:when>
+										<xsl:when test="$image_location = 'bottom'">
+											<div class="yui3-u-1">
+												<div class="content">
+													<xsl:call-template name="nuds_content"/>
+												</div>
+											</div>
+											<div class="yui3-u-1-2">
+												<div class="content">
+													<xsl:call-template name="obverse_image"/>
+												</div>
+											</div>
+											<div class="yui3-u-1-2">
+												<div class="content">
+													<xsl:call-template name="reverse_image"/>
+												</div>
+											</div>
+										</xsl:when>
+									</xsl:choose>
+								</div>
 							</xsl:when>
 						</xsl:choose>
 					</xsl:when>
@@ -159,9 +173,13 @@
 				<xsl:call-template name="icons"/>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:call-template name="obverse_image"/>
-				<xsl:call-template name="reverse_image"/>
-				<xsl:call-template name="nuds_content"/>
+				<div class="yui3-u-1-1">
+					<div class="content">
+						<xsl:call-template name="obverse_image"/>
+						<xsl:call-template name="reverse_image"/>
+						<xsl:call-template name="nuds_content"/>
+					</div>
+				</div>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
