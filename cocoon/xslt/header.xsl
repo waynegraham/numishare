@@ -2,24 +2,28 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:numishare="http://code.google.com/p/numishare/" xmlns:xlink="http://www.w3.org/1999/xlink" exclude-result-prefixes="#all"
 	version="2.0">
 	<xsl:template name="header">
-		<div class="yui3-g" id="hd">
-			<div class="yui3-u-7-12">
-				<div class="banner">
-					<div class="title">CHRR <i>Online</i></div>
-					<div class="subtitle">Coin Hoards of the<br/> Roman Republic</div>
-				</div>
-			</div>
-			<div class="yui3-u-1-4" style="text-align:right;height:100%;vertical-align:bottom">
-				<form action="{$display_path}results" method="GET">
-					<input type="text" name="q" value="{$q}"/>
-					<xsl:if test="string($lang)">
-						<input type="hidden" name="lang" value="{$lang}"/>
-					</xsl:if>
-					<input type="submit" value="{numishare:normalizeLabel('header_search', $lang)}"/>
-				</form>
-			</div>
-			<div class="yui3-u-1-6"> test </div>
-		</div>
+		<table style="width:100%" id="hd">
+			<tr>
+				<td style="width:60%">
+					<div class="banner">
+						<div class="title">CHRR <i>Online</i></div>
+						<div class="subtitle">Coin Hoards of the<br/> Roman Republic</div>
+					</div>
+				</td>
+				<td style="width:25%">
+					<form action="{$display_path}results" method="GET">
+						<input type="text" name="q"/>
+						<xsl:if test="string($lang)">
+							<input type="hidden" name="lang" value="{$lang}"/>
+						</xsl:if>
+						<input type="submit" value="{numishare:normalizeLabel('header_search', $lang)}"/>
+					</form>
+				</td>
+				<td style="width:15%">
+					coin images
+				</td>
+			</tr>
+		</table>
 		<div class="yui3-g">
 			<div class="yui3-u-1">
 				<ul role="menubar" id="menu">
