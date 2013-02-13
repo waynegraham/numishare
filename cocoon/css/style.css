@@ -15,6 +15,7 @@ html {
 	background-position:left top;
 	background-image:url('images/chrr_logo.png');
 	background-repeat:no-repeat;
+	background-attachment: fixed;
 }
 body {
 	margin-top:10px;
@@ -117,13 +118,13 @@ dt {
 .banner .title {
 	display: inline-block;
 	font-size:64px;
-	font-weight:bold;	
+	font-weight:bold;
 }
 .banner .subtitle {
 	display: inline-block;
 	font-size:16px;
 	font-weight:bold;
-	margin-left:40px;	
+	margin-left:40px;
 }
 #hd .align-left {
 	text-align:left;
