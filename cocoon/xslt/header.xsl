@@ -5,7 +5,11 @@
 
 		<!-- if displaying a coin or artifact record, the path to the other sections should be {$display_path} ; otherwise nothing -->
 		<div id="hd">
-			<div class="banner align-right">
+			<div class="banner">
+				<div class="title">CHRR <i>Online</i></div>
+				<div class="subtitle">Coin Hoards of the<br/> Roman Republic</div>
+			</div>
+			<!--<div class="banner align-right">
 				<xsl:if test="string(/content/config/banner_text)">
 					<div class="banner_text">
 						<xsl:value-of select="/content/config/banner_text"/>
@@ -14,7 +18,7 @@
 				<xsl:if test="string(//config/banner_image/@xlink:href)">
 					<img src="{$display_path}images/{//config/banner_image/@xlink:href}" alt="banner image"/>
 				</xsl:if>
-			</div>
+			</div>-->
 			<ul role="menubar" id="menu">
 				<xsl:call-template name="menubar"/>
 			</ul>
@@ -41,7 +45,7 @@
 						</ul>
 					</li>
 				</xsl:if>
-				<xsl:for-each select="//config/pages/page[public = '1']" >
+				<xsl:for-each select="//config/pages/page[public = '1']">
 					<li role="presentation">
 						<a href="{$display_path}pages/{@stub}{if (string($lang)) then concat('?lang=', $lang) else ''}">
 							<xsl:value-of select="short-title"/>
@@ -159,6 +163,6 @@
 				</xsl:if>
 			</xsl:otherwise>
 		</xsl:choose>
-	
+
 	</xsl:template>
 </xsl:stylesheet>

@@ -7,19 +7,34 @@
   GLOBAL
   ***************************************
  */
- html {
-	font:13px arial, helvetica, sans-serif;
-	background-color:silver;
+html {
+	font-size:13px;
+	font-family: Trebuchet MS,Helvetica,Arial,sans-serif;
+	background-color:black;
+	color:#333333;
+	background-position:left top;
+	background-image:url('images/chrr_logo.png');
+	background-repeat:no-repeat;
 }
 body {
-	margin:auto;
-	width:972px;
-	border:1px solid gray;
 	margin-top:10px;
 	background-color:white;
+	margin:0 160px;
+	min-width:1000px;
+}
+.yui3-g {
+	border-bottom:1px solid gray;
+	border-left:1px solid gray;
+	border-right:1px solid gray;
+}
+a {
+	color:#3383BB;
+}
+a:hover {
+	color:#599FCF
 }
 .content {
-	padding:5px;	
+	padding:5px;
 }
 a > img {
 	border:none;
@@ -35,13 +50,15 @@ th {
 	font-weight:bold;
 }
 input {
-	font:13px arial, helvetica, sans-serif;
+	font-size:13px;
+	font-family: Trebuchet MS,Helvetica,Arial,sans-serif;
 }
 select {
 	width:200px;
 	margin-left:15px;
 	margin-right:5px;
-	font:13px arial, helvetica, sans-serif;
+	font-size:13px;
+	font-family: Trebuchet MS,Helvetica,Arial,sans-serif;
 }
 #facet ol, ul, dl {
 	margin:0em;
@@ -51,7 +68,7 @@ ul li, dl li {
 }
 h4 {
 	margin:0;
-	padding:0;	
+	padding:0;
 }
 .ui-widget-header {
 	border-left:0;
@@ -77,7 +94,7 @@ h4 {
 	border:2px solid #b76e0e;
 }
 table tr td {
-	border:0;	
+	border:0;
 }
 dt {
 	width:125px;
@@ -88,9 +105,25 @@ dt {
   HEADER
   ***************************************
  */
+#hd {
+	background-color:black;
+}
 .banner {
-	padding:5px;
-	background-color:#ebebeb;
+	color:white;
+	display:table;
+	width:100%;
+	vertical-align:baseline
+}
+.banner .title {
+	display: inline-block;
+	font-size:64px;
+	font-weight:bold;	
+}
+.banner .subtitle {
+	display: inline-block;
+	font-size:16px;
+	font-weight:bold;
+	margin-left:40px;	
 }
 #hd .align-left {
 	text-align:left;
@@ -113,9 +146,9 @@ dt {
   ***************************************
  */
 #ft {
-	padding:10px 0;
+	padding:20px 0;
 	text-align:center;
-	background-color:#ebebeb;
+	background-color:black;
 }
 /*
   ***************************************
@@ -335,8 +368,8 @@ li.term {
 	border:1px solid silver;
 	padding:2px;
 }
-.compare-select{
-	width:400px;	
+.compare-select {
+	width:400px;
 }
 .category_list, .search_text {
 	width:175px;
@@ -688,7 +721,7 @@ div.custominfostyle {
 }
 #customQueryDiv {
 	width:100%;
-	display:table;	
+	display:table;
 }
 .filter-div, .customQuery, .compareQuery {
 	padding:10px 0;
@@ -703,7 +736,7 @@ div.custominfostyle {
 	float:left;
 	width:20%;
 }
-.customQuery{
+.customQuery {
 	display:table;
 	width:100%;
 }
