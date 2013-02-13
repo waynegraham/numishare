@@ -2,27 +2,30 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:numishare="http://code.google.com/p/numishare/" xmlns:xlink="http://www.w3.org/1999/xlink" exclude-result-prefixes="#all"
 	version="2.0">
 	<xsl:template name="header">
-
-		<!-- if displaying a coin or artifact record, the path to the other sections should be {$display_path} ; otherwise nothing -->
-		<div id="hd">
-			<div class="banner">
-				<div class="title">CHRR <i>Online</i></div>
-				<div class="subtitle">Coin Hoards of the<br/> Roman Republic</div>
+		<div class="yui3-g" id="hd">
+			<div class="yui3-u-7-12">
+				<div class="banner">
+					<div class="title">CHRR <i>Online</i></div>
+					<div class="subtitle">Coin Hoards of the<br/> Roman Republic</div>
+				</div>
 			</div>
-			<!--<div class="banner align-right">
-				<xsl:if test="string(/content/config/banner_text)">
-					<div class="banner_text">
-						<xsl:value-of select="/content/config/banner_text"/>
-					</div>
-				</xsl:if>
-				<xsl:if test="string(//config/banner_image/@xlink:href)">
-					<img src="{$display_path}images/{//config/banner_image/@xlink:href}" alt="banner image"/>
-				</xsl:if>
-			</div>-->
-			<ul role="menubar" id="menu">
-				<xsl:call-template name="menubar"/>
-			</ul>
-			<div id="log"/>
+			<div class="yui3-u-1-4" style="text-align:right;height:100%;vertical-align:bottom">
+				<form action="{$display_path}results" method="GET">
+					<input type="text" name="q" value="{$q}"/>
+					<xsl:if test="string($lang)">
+						<input type="hidden" name="lang" value="{$lang}"/>
+					</xsl:if>
+					<input type="submit" value="{numishare:normalizeLabel('header_search', $lang)}"/>
+				</form>
+			</div>
+			<div class="yui3-u-1-6"> test </div>
+		</div>
+		<div class="yui3-g">
+			<div class="yui3-u-1">
+				<ul role="menubar" id="menu">
+					<xsl:call-template name="menubar"/>
+				</ul>
+			</div>
 		</div>
 	</xsl:template>
 
