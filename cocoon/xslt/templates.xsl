@@ -218,9 +218,7 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<h2>Step 4: Select Hoards to Compare (optional)</h2>
-					<div class="compare-div">
-						<cinclude:include src="cocoon:/get_hoards?compare={$compare}&amp;q=*&amp;ignore={$id}"/>
-					</div>
+					<xsl:call-template name="get-hoards"/>
 				</xsl:otherwise>
 			</xsl:choose>
 
@@ -368,19 +366,7 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<h2>Step 3: Select Hoards to Compare (optional)</h2>
-					<xsl:choose>
-						<xsl:when test="not(string($compare))">
-							<div>
-								<a href="#" class="compare-button"><img src="{$display_path}images/plus.gif" alt="Expand"/>Compare to Other Hoards</a>
-								<div class="compare-div"/>
-							</div>
-						</xsl:when>
-						<xsl:otherwise>
-							<div class="compare-div">
-								<cinclude:include src="cocoon:/get_hoards?compare={$compare}&amp;q=*"/>
-							</div>
-						</xsl:otherwise>
-					</xsl:choose>
+					<xsl:call-template name="get-hoards"/>
 				</xsl:otherwise>
 			</xsl:choose>
 			<div>
@@ -483,10 +469,7 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<h2>Step 3: Select Hoards to Compare (optional)</h2>
-					<div>
-						<a href="#" class="compare-button"><img src="{$display_path}images/plus.gif" alt="Expand"/>Compare to Other Hoards</a>
-						<div class="compare-div"/>
-					</div>
+					<xsl:call-template name="get-hoards"/>
 				</xsl:otherwise>
 			</xsl:choose>
 
@@ -529,7 +512,7 @@
 
 	<xsl:template name="get-hoards">
 		<div class="compare-div">
-			<cinclude:include src="cocoon:/get_hoards?compare={$compare}&amp;q=*"/>
+			<cinclude:include src="cocoon:/get_hoards?compare={$compare}&amp;q=*&amp;ignore={$id}"/>
 		</div>
 	</xsl:template>
 
