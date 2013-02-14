@@ -433,6 +433,8 @@
 					<xsl:when test="$name='saleItem'">Sale Item</xsl:when>
 					<xsl:when test="$name='salePrice'">Sale Price</xsl:when>
 					<xsl:when test="$name='subjectSet'">SubjectSet</xsl:when>
+					<xsl:when test="$name='tpq'">Opening Date</xsl:when>
+					<xsl:when test="$name='taq'">Closing Date</xsl:when>
 					<xsl:when test="$name='testmark'">Test Mark</xsl:when>
 					<xsl:when test="$name='typeDesc'">Typological Description</xsl:when>
 					<xsl:when test="$name = 'timestamp'">Date Record Modified</xsl:when>
