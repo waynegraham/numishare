@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exsl="http://exslt.org/common" xmlns:gml="http://www.opengis.net/gml/"
 	xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:nm="http://nomisma.org/id/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:nuds="http://nomisma.org/nuds"
-	xmlns:nh="http://nomisma.org/nudsHoard" xmlns:cinclude="http://apache.org/cocoon/include/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" version="2.0">
+	xmlns:nh="http://nomisma.org/nudsHoard" xmlns:cinclude="http://apache.org/cocoon/include/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:numishare="http://code.google.com/p/numishare/"
+	xmlns:res="http://www.w3.org/2005/sparql-results#" exclude-result-prefixes="exsl gml skos nm rdf nuds nh cinclude xlink numishare res" version="2.0">
 	<xsl:template name="kml">
 		<kml xmlns="http://earth.google.com/kml/2.0">
 			<Document>
-				<Style xmlns="" id="mint">
+				<Style id="mint">
 					<IconStyle>
 						<scale>1</scale>
-						<hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
+						<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
 						<Icon>
-							<href>http://maps.google.com/mapfiles/kml/pal4/icon48.png</href>
+							<href>http://maps.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png</href>
 						</Icon>
 					</IconStyle>
 				</Style>
-				<Style xmlns="" id="hoard">
+				<Style id="hoard">
 					<IconStyle>
 						<scale>1</scale>
-						<hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
+						<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
 						<Icon>
-							<href>http://maps.google.com/mapfiles/kml/pal4/icon49.png</href>
+							<href>http://maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png</href>
 						</Icon>
 					</IconStyle>
 				</Style>
-				<Style xmlns="" id="mapped">
+				<Style id="mapped">
 					<IconStyle>
 						<scale>1</scale>
-						<hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
+						<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
 						<Icon>
-							<href>http://maps.google.com/mapfiles/kml/pal4/icon57.png</href>
+							<href>http://maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png</href>
 						</Icon>
 					</IconStyle>
 				</Style>
@@ -72,20 +73,41 @@
 				<xsl:with-param name="styleUrl">#hoard</xsl:with-param>
 			</xsl:call-template>
 		</xsl:for-each>
-		
+
 		<!-- gather associated hoards from Metis is available -->
 		<xsl:if test="string($sparql_endpoint)">
 			<cinclude:include src="cocoon:/widget?uri={concat('http://numismatics.org/ocre/', 'id/', $id)}&amp;template=kml"/>
 		</xsl:if>
 	</xsl:template>
-	
+
 	<xsl:template match="nuds:nuds" mode="json">
 		<xsl:for-each select="exsl:node-set($nudsGroup)/descendant::nuds:geogname[@xlink:role='mint'][string(@xlink:href)]">
 			<xsl:call-template name="getJsonPoint">
 				<xsl:with-param name="href" select="@xlink:href"/>
-				<xsl:with-param name="type">mint</xsl:with-param>
+				<xsl:with-param name="type">object-mint</xsl:with-param>
 			</xsl:call-template>
+			<xsl:if test="not(position()=last())">
+				<xsl:text>,</xsl:text>
+			</xsl:if>
 		</xsl:for-each>
+
+
+		<!-- gather associated hoards from Metis is available -->
+		<xsl:choose>
+			<xsl:when test="string($sparql_endpoint)">
+				<xsl:call-template name="numishare:getJsonFindspots">
+					<xsl:with-param name="uri" select="concat('http://numismatics.org/ocre/', 'id/', $id)"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:for-each select="exsl:node-set($nudsGroup)/descendant::nuds:geogname[@xlink:role='findspot'][string(@xlink:href)]|descendant::nuds:findspotDesc[string(@xlink:href)]">
+					<xsl:call-template name="getJsonPoint">
+						<xsl:with-param name="href" select="@xlink:href"/>
+						<xsl:with-param name="type">findspot</xsl:with-param>
+					</xsl:call-template>
+				</xsl:for-each>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template match="nh:nudsHoard" mode="kml">
@@ -99,7 +121,8 @@
 			<!-- commenting out unique portion: [not(.=preceding::nuds:geogname)] -->
 			<xsl:call-template name="getPlacemark">
 				<xsl:with-param name="href" select="@xlink:href"/>
-				<xsl:with-param name="styleUrl">#mapped</xsl:with-param>
+				<xsl:with-param name="type">mapped</xsl:with-param>
+				<xsl:with-param name="styleUrl">#mint</xsl:with-param>
 			</xsl:call-template>
 		</xsl:for-each>
 	</xsl:template>
@@ -227,6 +250,7 @@
 						</xsl:choose>
 					</xsl:if>
 				</xsl:when>
+				<xsl:when test="$type='object-mint'"/>
 				<xsl:otherwise>
 					<xsl:text>Findspot - </xsl:text>
 					<xsl:text>Lat: </xsl:text>
@@ -238,7 +262,7 @@
 		</xsl:variable>
 		<xsl:variable name="theme">
 			<xsl:choose>
-				<xsl:when test="$type='mint'">
+				<xsl:when test="$type='mint' or $type = 'object-mint'">
 					<xsl:text>blue</xsl:text>
 				</xsl:when>
 				<xsl:otherwise>
@@ -248,7 +272,7 @@
 		</xsl:variable>
 		<xsl:variable name="start">
 			<xsl:choose>
-				<xsl:when test="$type='mint'">
+				<xsl:when test="$type='mint' or $type='object-mint'">
 					<xsl:choose>
 						<xsl:when test="ancestor::nuds:typeDesc/nuds:date/@standardDate">
 							<xsl:value-of select="number(ancestor::nuds:typeDesc/nuds:date/@standardDate)"/>
@@ -267,7 +291,7 @@
 		</xsl:variable>
 		<xsl:variable name="end">
 			<xsl:choose>
-				<xsl:when test="$type='mint'">
+				<xsl:when test="$type='mint' or $type='object-mint'">
 					<xsl:if test="ancestor::nuds:typeDesc/nuds:dateRange/nuds:toDate/@standardDate">
 						<xsl:value-of select="number(ancestor::nuds:typeDesc/nuds:dateRange/nuds:toDate/@standardDate)"/>
 					</xsl:if>
@@ -281,39 +305,46 @@
 		</xsl:variable>
 		<!-- output --> { <xsl:if test="not($coordinates='NULL')">"point": {"lon": <xsl:value-of select="tokenize($coordinates, '\|')[2]"/>, "lat": <xsl:value-of
 				select="tokenize($coordinates, '\|')[1]"/>},</xsl:if> "title": "<xsl:value-of select="$title"/>", "start": "<xsl:value-of select="$start"/>", <xsl:if test="string($end)">"end":
-				"<xsl:value-of select="$end"/>",</xsl:if> "options": { "theme": "<xsl:value-of select="$theme"/>", "description": "<xsl:value-of select="$description"/>" } } </xsl:template>
+				"<xsl:value-of select="$end"/>",</xsl:if> "options": { "theme": "<xsl:value-of select="$theme"/>"<xsl:if test="string($description)">, "description": "<xsl:value-of
+				select="$description"/>"</xsl:if> } } </xsl:template>
 
 	<xsl:template name="getPlacemark">
 		<xsl:param name="href"/>
+		<xsl:param name="type"/>
 		<xsl:param name="styleUrl"/>
+
+		<xsl:variable name="label">
+			<!-- display the title (coin type reference) for hoards, place name for other points -->
+			<xsl:choose>
+				<xsl:when test="$type='mapped'">
+					<xsl:value-of select="ancestor::nuds:nuds/nuds:descMeta/nuds:title"/>
+				</xsl:when>
+				<xsl:when test="local-name()='findspotDesc'">
+					<xsl:choose>
+						<xsl:when test="contains($href, 'nomisma.org')">
+							<xsl:choose>
+								<xsl:when test="string(exsl:node-set($rdf)/rdf:RDF/*[@rdf:about=$href]/skos:prefLabel)">
+									<xsl:value-of select="exsl:node-set($rdf)/rdf:RDF/*[@rdf:about=$href]/skos:prefLabel"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$href"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="."/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+
 		<Placemark xmlns="http://earth.google.com/kml/2.0">
 			<name>
-				<!-- display the title (coin type reference) for hoards, place name for other points -->
-				<xsl:choose>
-					<xsl:when test="$styleUrl='#mapped'">
-						<xsl:value-of select="ancestor::nuds:nuds/nuds:descMeta/nuds:title"/>
-					</xsl:when>
-					<xsl:when test="local-name()='findspotDesc'">
-						<xsl:choose>
-							<xsl:when test="contains($href, 'nomisma.org')">
-								<xsl:choose>
-									<xsl:when test="string(exsl:node-set($rdf)/rdf:RDF/*[@rdf:about=$href]/skos:prefLabel)">
-										<xsl:value-of select="exsl:node-set($rdf)/rdf:RDF/*[@rdf:about=$href]/skos:prefLabel"/>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:value-of select="$href"/>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:when>
-						</xsl:choose>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="."/>
-					</xsl:otherwise>
-				</xsl:choose>
+				<xsl:value-of select="$label"/>
 			</name>
 			<xsl:choose>
-				<xsl:when test="$styleUrl='#mapped'">
+				<xsl:when test="$type='mapped'">
 					<description>
 						<xsl:value-of select="."/>
 						<!-- display date -->
@@ -335,13 +366,13 @@
 				<xsl:otherwise>
 					<description>
 						<![CDATA[
-          					<span><a href="]]><xsl:value-of select="$href"/><![CDATA[" target="_blank">]]><xsl:value-of select="."/><![CDATA[</a>]]>						
+          					<span><a href="]]><xsl:value-of select="$href"/><![CDATA[" target="_blank">]]><xsl:value-of select="$label"/><![CDATA[</a>]]>
 						<![CDATA[</span>
         				]]>
 					</description>
 				</xsl:otherwise>
 			</xsl:choose>
-			
+
 			<styleUrl>
 				<xsl:value-of select="$styleUrl"/>
 			</styleUrl>
@@ -357,7 +388,7 @@
 					</Point>
 				</xsl:when>
 				<xsl:when test="contains($href, 'nomisma')">
-					<xsl:variable name="coordinates" select="exsl:node-set($rdf)//*[@rdf:about=$href]/descendant::gml:pos"/>
+					<xsl:variable name="coordinates" select="exsl:node-set($rdf)//*[@rdf:about=$href]/descendant::gml:pos[1]"/>
 					<xsl:if test="string($coordinates)">
 						<xsl:variable name="lat" select="substring-before($coordinates, ' ')"/>
 						<xsl:variable name="lon" select="substring-after($coordinates, ' ')"/>
@@ -391,4 +422,76 @@
 			</xsl:choose>
 		</Placemark>
 	</xsl:template>
+
+	<!-- get findspots from SPARQL endpoint, returned in JSON -->
+	<xsl:template name="numishare:getJsonFindspots">
+		<xsl:param name="uri"/>
+
+		<xsl:variable name="query">
+			<![CDATA[PREFIX oac:      <http://www.openannotation.org/ns/>
+			PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+			PREFIX dcterms:  <http://purl.org/dc/terms/>
+			PREFIX nm:       <http://nomisma.org/id/>
+			
+			SELECT ?annotation ?uri ?title ?publisher ?findspot ?numismatic_term ?burial WHERE {
+			?annotation oac:hasBody <typeUri>.
+			?annotation oac:hasTarget ?uri .
+			?annotation dcterms:title ?title .
+			?annotation dcterms:publisher ?publisher .
+			?annotation nm:findspot ?findspot .
+			OPTIONAL { ?annotation nm:numismatic_term ?numismatic_term }
+			OPTIONAL { ?annotation nm:approximateburialdate ?burial }}]]>
+		</xsl:variable>
+		<xsl:variable name="service" select="concat($sparql_endpoint, '?query=', encode-for-uri(normalize-space(replace($query, 'typeUri', $uri))), '&amp;output=xml')"/>
+		<xsl:apply-templates select="document($service)/res:sparql" mode="json"/>
+	</xsl:template>
+
+	<xsl:template match="res:sparql" mode="json">
+		<xsl:if test="count(descendant::res:result/res:binding[@name='findspot']) &gt; 0">
+			<xsl:text>,</xsl:text>
+		</xsl:if>
+		<xsl:apply-templates select="descendant::res:result/res:binding[@name='findspot']" mode="json"/>
+	</xsl:template>
+
+	<xsl:template match="res:binding[@name='findspot']" mode="json">
+		<xsl:variable name="coordinates">
+			<!-- add placemark -->
+			<xsl:choose>
+				<xsl:when test="contains(child::res:uri, 'geonames')">
+					<xsl:variable name="geonameId" select="substring-before(substring-after(child::res:uri, 'geonames.org/'), '/')"/>
+					<xsl:variable name="geonames_data" select="document(concat($geonames-url, '/get?geonameId=', $geonameId, '&amp;username=', $geonames_api_key, '&amp;style=full'))"/>
+					<xsl:variable name="coordinates" select="concat(exsl:node-set($geonames_data)//lng, '|', exsl:node-set($geonames_data)//lat)"/>
+					<xsl:value-of select="$coordinates"/>
+				</xsl:when>
+				<xsl:when test="string(res:literal)">
+					<xsl:value-of select="res:literal"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="title">
+			<xsl:value-of select="parent::node()/res:binding[@name='title']/res:literal"/>
+		</xsl:variable>
+		<xsl:variable name="description">
+			<![CDATA[
+          					<span><a href=']]><xsl:value-of select="parent::node()/res:binding[@name='uri']/res:uri"/><![CDATA[' target='_blank'>]]><xsl:value-of
+				select="parent::node()/res:binding[@name='title']/res:literal"/><![CDATA[</a>]]>
+			<xsl:if test="string(parent::node()/res:binding[@name='burial']/res:literal)">
+				<![CDATA[- closing date: ]]><xsl:value-of select="numishare:normalizeYear(number(parent::node()/res:binding[@name='burial']/res:literal))"/>
+			</xsl:if>
+			<![CDATA[</span>
+        				]]>
+		</xsl:variable>
+		<xsl:variable name="theme">red</xsl:variable>
+		<xsl:variable name="start">
+			<xsl:value-of select="number(parent::node()/res:binding[@name='burial']/res:literal)"/>
+		</xsl:variable>
+		<xsl:variable name="end"/>
+		<!-- output --> { <xsl:if test="not($coordinates='NULL')">"point": {"lon": <xsl:value-of select="tokenize($coordinates, '\|')[1]"/>, "lat": <xsl:value-of
+				select="tokenize($coordinates, '\|')[2]"/>},</xsl:if> "title": "<xsl:value-of select="$title"/>", "start": "<xsl:value-of select="$start"/>", <xsl:if test="string($end)">"end":
+					"<xsl:value-of select="$end"/>",</xsl:if> "options": { "theme": "<xsl:value-of select="$theme"/>", "infoHtml": "<xsl:value-of select="normalize-space($description)"/>" } } <xsl:if
+			test="not(position()=last())">
+			<xsl:text>,</xsl:text>
+		</xsl:if>
+	</xsl:template>
+
 </xsl:stylesheet>
