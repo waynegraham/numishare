@@ -10,7 +10,7 @@
 
 	<xsl:template match="/">
 		<rdf:RDF>
-			<xsl:apply-templates select="/content/*[not(local-name()='config')]" mode="cidoc"/>
+			<xsl:apply-templates select="/content/*[not(local-name()='config')]" mode="nomisma"/>
 		</rdf:RDF>
 	</xsl:template>
 
