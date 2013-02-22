@@ -163,17 +163,6 @@ $(document).ready(function () {
 				$("#" + id).multiselect('refresh')
 			});
 		},
-		//close menu: restore button title if no checkboxes are selected
-		close: function () {
-			var title = $(this).attr('title');
-			var id = $(this) .attr('id');
-			var array_of_checked_values = $(this).multiselect("getChecked").map(function () {
-				return this.value;
-			}).get();
-			if (array_of_checked_values.length == 0) {
-				$('button[title=' + title + ']').children('span:nth-child(2)').text(title);
-			}
-		},
 		click: function () {
 			var title = $(this).attr('title');
 			var id = $(this) .attr('id');
@@ -185,30 +174,12 @@ $(document).ready(function () {
 				$(this).next('button').children('span:nth-child(2)').text(title + ': ' + length + ' selected');
 			} else if (length > 0 && length <= 3) {
 				$(this).next('button').children('span:nth-child(2)').text(title + ': ' + array_of_checked_values.join(', '));
-			} else if (length == 0) {
-				var q = getQuery();
-				if (q.length > 0) {
-					var category = id.split('-select')[0];
-					var mincount = $(this).attr('mincount');
-					$.get('maps_get_facet_options', {
-						q: q, category: category, sort: 'index', limit: - 1, offset: 0, mincount: mincount
-					},
-					function (data) {
-						$('#' + id) .attr('new_query', '');
-						$('#' + id) .html(data);
-						$('#' + id).multiselect('refresh');
-					});
-				}
+			} else if (length == 0){
+				$(this).next('button').children('span:nth-child(2)').text(title);
 			}
-			
-			if ($('#mapcontainer').length > 0) {
-				//update map
-				refresh_map();
-			}
-		},
-		uncheckAll: function () {
-			var id = $(this) .attr('id');
-			q = getQuery();
+
+			//refresh dynamically 
+			var q = getQuery();
 			if (q.length > 0) {
 				var category = id.split('-select')[0];
 				var mincount = $(this).attr('mincount');
@@ -221,6 +192,30 @@ $(document).ready(function () {
 					$('#' + id).multiselect('refresh');
 				});
 			}
+			
+			if ($('#mapcontainer').length > 0) {
+				//update map
+				refresh_map();
+			}
+		},
+		uncheckAll: function () {	
+			//reset title
+			var title = $(this).attr('title');
+			$(this).next('button').children('span:nth-child(2)').text(title);	
+			
+			var id = $(this) .attr('id');
+			q = getQuery();
+			var category = id.split('-select')[0];
+			var mincount = $(this).attr('mincount');
+			$.get('maps_get_facet_options', {
+				q: q, category: category, sort: 'index', limit: - 1, offset: 0, mincount: mincount
+			},
+			function (data) {
+				$('#' + id) .attr('new_query', '');
+				$('#' + id) .html(data);
+				$('#' + id).multiselect('refresh');
+			});
+			
 			if ($('#mapcontainer').length > 0) {
 				//update map
 				refresh_map();
