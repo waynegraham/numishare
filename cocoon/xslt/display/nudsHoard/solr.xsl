@@ -57,11 +57,11 @@
 			<xsl:value-of select="normalize-space(nh:descMeta/nh:title[1])"/>
 		</xsl:variable>
 
-
 		<doc>
 			<field name="id">
 				<xsl:value-of select="nh:nudsHeader/nh:nudsid"/>
 			</field>
+			<xsl:copy-of select="$geonames"/>
 			<field name="collection-name">
 				<xsl:value-of select="$collection-name"/>
 			</field>

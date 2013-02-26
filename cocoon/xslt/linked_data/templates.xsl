@@ -116,9 +116,7 @@
 				</nm:type_series_item>
 			</xsl:when>
 			<xsl:when test="@recordType='physical'">
-				<rdf:Description>
-					
-				</rdf:Description>
+				<rdf:Description> </rdf:Description>
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
@@ -166,10 +164,10 @@
 			</nm:description>
 		</xsl:for-each>
 	</xsl:template>
-	
+
 	<xsl:template match="nuds:material|nuds:denomination|nuds:manufacture|nuds:geogname|nuds:persname|nuds:corpname" mode="nomisma">
 		<xsl:variable name="element" select="if (@xlink:role) then @xlink:role else local-name()"/>
-		
+
 		<xsl:choose>
 			<xsl:when test="string(@xlink:href)">
 				<xsl:element name="nm:{$element}">
@@ -179,21 +177,21 @@
 			<xsl:otherwise>
 				<xsl:element name="nm:{$element}">
 					<xsl:value-of select="."/>
-				</xsl:element>					
+				</xsl:element>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	
+
 	<xsl:template match="nuds:date" mode="nomisma">
 		<nm:start_date rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">
 			<xsl:value-of select="@standardDate"/>
 		</nm:start_date>
 		<nm:end_date rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">
 			<xsl:value-of select="@standardDate"/>
-		</nm:end_date>					
-		
+		</nm:end_date>
+
 	</xsl:template>
-	
+
 	<xsl:template match="nuds:dateRange" mode="nomisma">
 		<nm:start_date rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">
 			<xsl:value-of select="nuds:fromDate/@standardDate"/>
@@ -202,10 +200,37 @@
 			<xsl:value-of select="nuds:toDate/@standardDate"/>
 		</nm:end_date>
 	</xsl:template>
-	
+
 	<!-- PROCESS NUDS-HOARD RECORDS INTO NOMISMA/METIS COMPLIANT RDF MODELS -->
 	<xsl:template match="nh:nudsHoard" mode="nomisma">
-		
+		<xsl:variable name="id" select="descendant::*[local-name()='nudsid']"/>
+
+		<rdf:Description rdf:about="{$url}id/{$id}">
+			<xsl:choose>
+				<xsl:when test="lang('en', descendant::nh:descMeta/nh:title)">
+					<dcterms:title xml:lang="en">
+						<xsl:value-of select="descendant::nh:descMeta/nh:title[@xml:lang='en']"/>
+					</dcterms:title>
+				</xsl:when>
+				<xsl:otherwise>
+					<dcterms:title xml:lang="en">
+						<xsl:value-of select="descendant::nh:descMeta/nh:title[1]"/>
+					</dcterms:title>
+				</xsl:otherwise>
+			</xsl:choose>
+			<dcterms:publisher>
+				<xsl:value-of select="descendant::nh:nudsHeader//nh:publisher"/>
+			</dcterms:publisher>
+			<xsl:for-each select="descendant::nh:geogname[@xlink:role='findspot'][string(@xlink:href)]">
+				<nm:findspot rdf:resource="{@xlink:href}"/>
+			</xsl:for-each>
+			<xsl:for-each select="descendant::nuds:typeDesc/@xlink:href">
+				
+			</xsl:for-each>
+			<xsl:for-each select="descendant::nuds:typeDesc/@xlink:href|descendant::nuds:undertypeDesc/@xlink:href">
+				<nm:type_series_item rdf:resource="{.}"/>
+			</xsl:for-each>
+		</rdf:Description>
 	</xsl:template>
 
 	<!-- ************** SOLR-TO-XML **************** -->
@@ -503,7 +528,7 @@
 	<xsl:template match="doc" mode="ctype">
 		<xsl:variable name="id" select="str[@name='id']"/>
 		<xsl:variable name="recordType" select="str[@name='recordType']"/>
-		
+
 		<rdf:Description rdf:about="{$url}id/{$id}">
 			<dcterms:title>
 				<xsl:value-of select="str[@name='title_display']"/>
@@ -562,7 +587,7 @@
 			</xsl:if>
 			<xsl:if test="string(str[@name='reference_rev'])">
 				<nm:reverseReference rdf:resource="str[@name='reference_rev']"/>
-			</xsl:if>						
+			</xsl:if>
 		</rdf:Description>
 	</xsl:template>
 

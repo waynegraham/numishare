@@ -79,9 +79,21 @@
 		<places>
 			<xsl:for-each select="distinct-values(descendant::*[local-name()='geogname'][contains(@xlink:href, 'geonames.org')]/@xlink:href)">
 				<xsl:variable name="geonameId" select="substring-before(substring-after(., 'geonames.org/'), '/')"/>
-				<xsl:variable name="geonames_data" select="document(concat($geonames-url, '/get?geonameId=', $geonameId, '&amp;username=', $geonames_api_key, '&amp;style=full'))"/>
-				<xsl:variable name="coordinates" select="concat(exsl:node-set($geonames_data)//lng, ',', exsl:node-set($geonames_data)//lat)"/>
-				<place id="{.}">
+				<xsl:variable name="geonames_data" select="document(concat($geonames-url, '/get?geonameId=', $geonameId, '&amp;username=', $geonames_api_key, '&amp;style=full'))" as="element()*"/>
+				<xsl:variable name="coordinates" select="concat($geonames_data//lng, ',', $geonames_data//lat)"/>
+				
+				<!-- create facetRegion hierarchy -->
+				<xsl:variable name="hier">
+					<xsl:value-of select="$geonames_data//countryName"/>
+					<xsl:text>|</xsl:text>
+					<xsl:for-each select="$geonames_data//*[starts-with(local-name(), 'adminName')]">
+						<xsl:sort select="local-name()"/>
+						<xsl:value-of select="."/>
+						<xsl:text>|</xsl:text>						
+					</xsl:for-each>
+				</xsl:variable>
+				
+				<place id="{.}" hier="{$hier}">
 					<xsl:value-of select="$coordinates"/>
 				</place>
 			</xsl:for-each>
