@@ -688,6 +688,9 @@ div.custominfostyle {
 	display:table;
 	width:100%;
 }
+.hierarchical-list{
+	display:table;	
+}
 .decades-list {
 	padding-left:20px
 }
