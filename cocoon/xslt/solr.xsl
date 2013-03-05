@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Author: Ethan Gruber
-	Modified: January 2013
+	Modified: April 2012
 	Function: This stylesheet reads the incoming object model (nuds or nudsHoard)
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:nuds="http://nomisma.org/nuds" xmlns:nh="http://nomisma.org/nudsHoard" xmlns:nm="http://nomisma.org/id/"
-	xmlns:exsl="http://exslt.org/common" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" exclude-result-prefixes="#all" version="2.0">
+	xmlns:exsl="http://exslt.org/common" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:cinclude="http://apache.org/cocoon/include/1.0"
+	exclude-result-prefixes="#all" version="2.0">
 	<xsl:output method="xml" encoding="UTF-8"/>
 	<xsl:include href="functions.xsl"/>
 	<xsl:include href="display/nuds/solr.xsl"/>
 	<xsl:include href="display/nudsHoard/solr.xsl"/>
 	<xsl:include href="display/shared-solr.xsl"/>
-	
+
 	<xsl:param name="collection-name"/>
 
 	<!-- config variables -->
 	<xsl:variable name="geonames-url">
 		<xsl:text>http://api.geonames.org</xsl:text>
 	</xsl:variable>
+	<xsl:variable name="url" select="/content/config/url"/>
 	<xsl:variable name="geonames_api_key" select="/content/config/geonames_api_key"/>
 	<xsl:variable name="sparql_endpoint" select="/content/config/sparql_endpoint"/>
 	<xsl:variable name="publisher" select="/content/config/template/publisher"/>
@@ -34,7 +36,7 @@
 			</xsl:variable>
 
 			<xsl:if test="string-length($id-param) &gt; 0">
-				<xsl:for-each select="document(concat('http://nomisma.org/get-nuds?id=', $id-param))//nuds:nuds">
+				<xsl:for-each select="document(concat('http://nomisma.org/get-nuds?id=', encode-for-uri($id-param)))//nuds:nuds">
 					<object xlink:href="http://nomisma.org/id/{nuds:nudsHeader/nuds:nudsid}">
 						<xsl:copy-of select="."/>
 					</object>
@@ -75,11 +77,30 @@
 	<!-- accumulate unique geonames IDs -->
 	<xsl:variable name="geonames">
 		<places>
-			<xsl:for-each select="distinct-values(descendant::*[local-name()='geogname'][contains(@xlink:href, 'geonames.org')]/@xlink:href)">
+			<xsl:for-each select="distinct-values(descendant::*[local-name()='geogname'][contains(@xlink:href, 'geonames.org')]/@xlink:href|exsl:node-set($rdf)/descendant::*[contains(@rdf:resource, 'geonames.org')]/@rdf:resource)">
 				<xsl:variable name="geonameId" select="substring-before(substring-after(., 'geonames.org/'), '/')"/>
-				<xsl:variable name="geonames_data" select="document(concat($geonames-url, '/get?geonameId=', $geonameId, '&amp;username=', $geonames_api_key, '&amp;style=full'))"/>
-				<xsl:variable name="coordinates" select="concat(exsl:node-set($geonames_data)//lng, ',', exsl:node-set($geonames_data)//lat)"/>
-				<place id="{.}">
+				<xsl:variable name="geonames_data" as="element()*">
+					<results>
+						<xsl:copy-of select="document(concat($geonames-url, '/get?geonameId=', $geonameId, '&amp;username=', $geonames_api_key, '&amp;style=full'))"/>
+					</results>
+				</xsl:variable>
+				<xsl:variable name="coordinates" select="concat($geonames_data//lng, ',', $geonames_data//lat)"/>
+				
+				<!-- create facetRegion hierarchy -->
+				<xsl:variable name="hierarchy">
+					<xsl:value-of select="$geonames_data//countryName"/>
+					<xsl:for-each select="$geonames_data//*[starts-with(local-name(), 'adminName')]">
+						<xsl:sort select="local-name()"/>
+						<xsl:if test="string-length(.) &gt; 0">
+							<xsl:text>|</xsl:text>
+							<xsl:value-of select="."/>
+						</xsl:if>		
+					</xsl:for-each>
+					<xsl:text>|</xsl:text>
+					<xsl:value-of select="$geonames_data//name"/>
+				</xsl:variable>
+				
+				<place id="{.}" hierarchy="{$hierarchy}">
 					<xsl:value-of select="$coordinates"/>
 				</place>
 			</xsl:for-each>

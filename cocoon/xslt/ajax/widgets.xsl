@@ -462,20 +462,57 @@ for example pulling data from the coin-type triplestore and SPARQL endpoint, Met
 
 	<xsl:template match="res:binding[@name='findspot']" mode="solr">
 		<!-- *_geo format is 'mint name|URI of resource|KML-compliant geographic coordinates' -->
-		<xsl:variable name="coords">
-			<xsl:choose>
-				<xsl:when test="contains(child::res:uri, 'geonames')">
-					<xsl:variable name="geonameId" select="substring-before(substring-after(child::res:uri, 'geonames.org/'), '/')"/>
-					<xsl:variable name="geonames_data" select="document(concat($geonames-url, '/get?geonameId=', $geonameId, '&amp;username=', $geonames_api_key, '&amp;style=full'))"/>
-					<xsl:variable name="coordinates" select="concat(exsl:node-set($geonames_data)//lng, ',', exsl:node-set($geonames_data)//lat)"/>
-
+		<xsl:choose>
+			<xsl:when test="contains(child::res:uri, 'geonames')">
+				<xsl:variable name="geonameId" select="substring-before(substring-after(child::res:uri, 'geonames.org/'), '/')"/>
+				<xsl:variable name="geonames_data" as="element()*">
+					<results>
+						<xsl:copy-of select="document(concat($geonames-url, '/get?geonameId=', $geonameId, '&amp;username=', $geonames_api_key, '&amp;style=full'))"/>
+					</results>
+				</xsl:variable>
+				<xsl:variable name="coordinates" select="concat($geonames_data//lng, ',', $geonames_data//lat)"/>
+				
+				<field name="findspot_geo">
+					<xsl:value-of select="parent::node()/res:binding[@name='title']/res:literal"/>
+					<xsl:text>|</xsl:text>
+					<xsl:value-of select="child::res:uri"/>
+					<xsl:text>|</xsl:text>
 					<xsl:value-of select="$coordinates"/>
-				</xsl:when>
-				<xsl:when test="string(res:literal)">
+				</field>
+				
+				<!-- hierarchy -->
+			<!--	<xsl:variable name="hierarchy">
+					<xsl:value-of select="$geonames_data//countryName"/>
+					<xsl:for-each select="$geonames_data//*[starts-with(local-name(), 'adminName')]">
+						<xsl:sort select="local-name()"/>
+						<xsl:if test="string-length(.) &gt; 0">
+							<xsl:text>|</xsl:text>
+							<xsl:value-of select="."/>
+						</xsl:if>		
+					</xsl:for-each>
+					<xsl:text>|</xsl:text>
+					<xsl:value-of select="$geonames_data//name"/>
+				</xsl:variable>
+				
+				<xsl:for-each select="tokenize($hierarchy, '\|')">
+					<field name="findspot_hier">
+						<xsl:value-of select="concat('L', position(), '|', .)"/>
+					</field>
+					<field name="findspot_text">
+						<xsl:value-of select="."/>
+					</field>
+				</xsl:for-each>-->
+			</xsl:when>
+			<xsl:when test="string(res:literal)">
+				<field name="findspot_geo">
+					<xsl:value-of select="parent::node()/res:binding[@name='title']/res:literal"/>
+					<xsl:text>|</xsl:text>
+					<xsl:value-of select="child::res:uri"/>
+					<xsl:text>|</xsl:text>
 					<xsl:value-of select="res:literal"/>
-				</xsl:when>
-			</xsl:choose>
-		</xsl:variable>
+				</field>
+			</xsl:when>
+		</xsl:choose>
 
 		<field name="findspot_facet">
 			<xsl:value-of select="parent::node()/res:binding[@name='title']/res:literal"/>
@@ -485,13 +522,6 @@ for example pulling data from the coin-type triplestore and SPARQL endpoint, Met
 				<xsl:value-of select="child::res:uri"/>
 			</field>
 		</xsl:if>
-		<field name="findspot_geo">
-			<xsl:value-of select="parent::node()/res:binding[@name='title']/res:literal"/>
-			<xsl:text>|</xsl:text>
-			<xsl:value-of select="child::res:uri"/>
-			<xsl:text>|</xsl:text>
-			<xsl:value-of select="$coords"/>
-		</field>
 	</xsl:template>
 
 </xsl:stylesheet>

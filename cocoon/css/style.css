@@ -248,26 +248,10 @@ div.facet {
 	margin-bottom:10px;
 	border:1px solid silver;
 }
-li.term {
+li.h_item {
 	margin:2px 0;
 	display:table;
 	width:100%;
-}
-.fn {
-	float:left;
-	width:75%;
-}
-.ft {
-	float:left;
-	width:25%;
-	text-align:right;
-}
-.fn span, .category_term, .clear_terms, .ft span {
-	color:blue;
-}
-.fn span:hover, .category_term:hover, .clear_terms:hover {
-	color:#B5121B;
-	cursor:pointer;
 }
 .get_facets, .hide_facets {
 	float:right;
@@ -279,19 +263,6 @@ li.term {
 	background:none repeat scroll 0 0 #efefef;
 	overflow:auto;
 	z-index:2002;
-}
-.facet_list_expanded {
-	width:500px;
-	max-height:400px;
-	z-index:2002;
-	position:absolute;
-}
-.facet_list_expanded li.term {
-	width:400px;
-	padding-left:50px;
-}
-.category_level {
-	margin-left:15px;
 }
 .expand_category {
 	margin:1px;
@@ -668,16 +639,25 @@ div.custominfostyle {
 #numishare-widget img {
 	padding:10px;
 }
+/*
+  ****************************************
+  HIERARCHICAL FACETS
+  ***************************************
+ */
 /* Used for date (century/decade) facet */
-.date-div {
+.date-div, .hierarchical-div {
 	margin-top:-10px;
+}
+.hierarchical-list ul {
+	padding-left:20px;
+		
+}
+.hierarchical-list {
+	display:table;
 }
 .century-multiselect-checkboxes {
 	display:table;
 	width:100%;
-}
-.decades-list {
-	margin:0 0 0 25px;
 }
 .close {
 	float:right;

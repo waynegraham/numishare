@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="2.0" xmlns:nuds="http://nomisma.org/nuds" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:datetime="http://exslt.org/dates-and-times"
+<xsl:stylesheet version="2.0" xmlns:nuds="http://nomisma.org/nuds" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:datetime="http://exslt.org/dates-and-times" xmlns:nm="http://nomisma.org/id/"
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exsl="http://exslt.org/common" xmlns:mets="http://www.loc.gov/METS/"
 	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gml="http://www.opengis.net/gml/" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:cinclude="http://apache.org/cocoon/include/1.0"
 	exclude-result-prefixes="#all">
@@ -10,7 +10,7 @@
 
 	<xsl:template match="nuds:nuds">
 		<xsl:variable name="id" select="nuds:nudsHeader/nuds:nudsid"/>
-		
+
 		<doc>
 			<field name="id">
 				<xsl:value-of select="$id"/>
@@ -133,6 +133,28 @@
 									<xsl:value-of select="concat($lon, ',', $lat)"/>
 								</field>
 							</xsl:if>
+						</xsl:if>
+						<xsl:if test="exsl:node-set($rdf)/rdf:RDF/*[@rdf:about=$href]/descendant::nm:findspot[contains(@rdf:resource, 'geonames.org')]">
+							<xsl:variable name="geonamesUri" select="exsl:node-set($rdf)/rdf:RDF/*[@rdf:about=$href]/descendant::nm:findspot[contains(@rdf:resource, 'geonames.org')][1]/@rdf:resource"/>
+							<field name="findspot_geo">
+								<xsl:value-of select="$label"/>
+								<xsl:text>|</xsl:text>
+								<xsl:value-of select="$href"/>
+								<xsl:text>|</xsl:text>
+								<xsl:value-of select="exsl:node-set($geonames)//place[@id=$geonamesUri]"/>
+							</field>
+
+							<!-- insert hierarchical facets -->
+							<xsl:for-each select="tokenize(exsl:node-set($geonames)//place[@id=$geonamesUri]/@hierarchy, '\|')">
+								<field name="findspot_hier">
+									<xsl:value-of select="concat('L', position(), '|', .)"/>
+								</field>
+								<field name="findspot_text">
+									<xsl:value-of select="."/>
+								</field>
+
+
+							</xsl:for-each>
 						</xsl:if>
 						<field name="findspot_facet">
 							<xsl:value-of select="$label"/>
