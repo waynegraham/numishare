@@ -60,8 +60,7 @@
 		<doc>
 			<field name="id">
 				<xsl:value-of select="nh:nudsHeader/nh:nudsid"/>
-			</field>
-			<xsl:copy-of select="$geonames"/>
+			</field>			
 			<field name="collection-name">
 				<xsl:value-of select="$collection-name"/>
 			</field>
