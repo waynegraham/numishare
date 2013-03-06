@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs exsl nm nuds nh xlink" xmlns:exsl="http://exslt.org/common"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs exsl nuds nh xlink mets" xmlns:exsl="http://exslt.org/common"
 	xmlns:gml="http://www.opengis.net/gml/" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:nm="http://nomisma.org/id/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:nuds="http://nomisma.org/nuds" xmlns:nh="http://nomisma.org/nudsHoard" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:georss="http://www.georss.org/georss" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:oac="http://www.openannotation.org/ns/" xmlns:owl="http://www.w3.org/2002/07/owl#"
-	xmlns:dc="http://purl.org/dc/terms/" xmlns:gx="http://www.google.com/kml/ext/2.2" version="2.0">
+	xmlns:dc="http://purl.org/dc/terms/" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:mets="http://www.loc.gov/METS/" version="2.0">
 
 	<!-- ************** OBJECT-TO-RDF **************** -->
 	<xsl:template name="rdf">
@@ -67,20 +67,6 @@
 		</oac:Annotation>
 	</xsl:template>
 
-	<xsl:template match="nuds:nuds|nh:nudsHoard" mode="ctype">
-		<xsl:variable name="id" select="descendant::*[local-name()='nudsid']"/>
-
-		<oac:Annotation rdf:about="{$url}ctype.rdf#{$id}">
-			<dcterms:title>
-				<xsl:value-of select="descendant::*[local-name()='descMeta']/*[local-name()='title']"/>
-			</dcterms:title>
-			<xsl:for-each select="descendant::nuds:typeDesc/@xlink:href|descendant::nuds:undertypeDesc/@xlink:href">
-				<oac:hasBody rdf:resource="{.}"/>
-			</xsl:for-each>
-			<oac:hasTarget rdf:resource="{$url}id/{$id}"/>
-		</oac:Annotation>
-	</xsl:template>
-
 	<xsl:template match="nuds:nuds|nh:nudsHoard" mode="cidoc">
 		<xsl:variable name="id" select="descendant::*[local-name()='nudsid']"/>
 
@@ -116,9 +102,71 @@
 				</nm:type_series_item>
 			</xsl:when>
 			<xsl:when test="@recordType='physical'">
-				<rdf:Description> </rdf:Description>
+				<nm:coin rdf:about="{$url}id/{$id}">
+					<dcterms:title>
+						<xsl:value-of select="nuds:descMeta/nuds:title"/>
+					</dcterms:title>
+					<xsl:if test="nuds:descMeta/nuds:adminDesc/nuds:identifier">
+						<dcterms:identifier>
+							<xsl:value-of select="nuds:descMeta/nuds:adminDesc/nuds:identifier"/>
+						</dcterms:identifier>
+					</xsl:if>
+					<xsl:if test="nuds:nudsHeader/nuds:publicationStmt/nuds:publisher">
+						<dcterms:publisher>
+							<xsl:value-of select="nuds:nudsHeader/nuds:publicationStmt/nuds:publisher"/>
+						</dcterms:publisher>
+					</xsl:if>
+
+					<nm:numismatic_term rdf:resource="http://nomisma.org/id/coin"/>
+					<xsl:if test="string(nuds:descMeta/nuds:typeDesc/@xlink:href)">
+						<nm:type_series_item rdf:resource="{nuds:descMeta/nuds:typeDesc/@xlink:href}"/>
+					</xsl:if>
+					<!-- physical attributes -->
+					<xsl:apply-templates select="nuds:descMeta/nuds:physDesc" mode="nomisma"/>
+
+					<!-- images -->
+					<xsl:apply-templates select="nuds:digRep/mets:fileSec" mode="nomisma"/>
+				</nm:coin>
 			</xsl:when>
 		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template match="mets:fileSec" mode="nomisma">
+		<xsl:for-each select="mets:fileGrp">
+			<xsl:variable name="side" select="@USE"/>
+
+			<xsl:for-each select="mets:file">
+				<xsl:variable name="element" select="concat($side, concat(upper-case(substring(@USE, 1, 1)), substring(@USE, 2)))"/>
+
+				<xsl:element name="nm:{$element}">
+					<xsl:attribute name="rdf:resource">
+						<xsl:choose>
+							<xsl:when test="contains(mets:FLocat/@xlink:href, 'http://')">
+								<xsl:value-of select="mets:FLocat/@xlink:href"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="concat($url, mets:FLocat/@xlink:href)"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+				</xsl:element>
+			</xsl:for-each>
+		</xsl:for-each>
+	</xsl:template>
+
+	<xsl:template match="nuds:physDesc" mode="nomisma">
+		<xsl:if test="nuds:axis">
+			<nm:axis rdf:datatype="xs:integer">
+				<xsl:value-of select="nuds:axis"/>
+			</nm:axis>
+		</xsl:if>
+
+		<xsl:for-each select="nuds:measurementsSet/*">
+			<xsl:element name="nm:{local-name()}">
+				<xsl:attribute name="rdf:datatype">xs:decimal</xsl:attribute>
+				<xsl:value-of select="."/>
+			</xsl:element>
+		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template match="nuds:typeDesc" mode="nomisma">
@@ -205,7 +253,7 @@
 	<xsl:template match="nh:nudsHoard" mode="nomisma">
 		<xsl:variable name="id" select="descendant::*[local-name()='nudsid']"/>
 
-		<rdf:Description rdf:about="{$url}id/{$id}">
+		<nm:hoard rdf:about="{$url}id/{$id}">
 			<xsl:choose>
 				<xsl:when test="lang('en', descendant::nh:descMeta/nh:title)">
 					<dcterms:title xml:lang="en">
@@ -224,13 +272,78 @@
 			<xsl:for-each select="descendant::nh:geogname[@xlink:role='findspot'][string(@xlink:href)]">
 				<nm:findspot rdf:resource="{@xlink:href}"/>
 			</xsl:for-each>
-			<xsl:for-each select="descendant::nuds:typeDesc/@xlink:href">
-				
-			</xsl:for-each>
+			<!-- closing date -->
+			<xsl:choose>
+				<xsl:when test="not(descendant::nh:deposit/nh:date) and not(descendant::nh:deposit/nh:dateRange)">
+					<xsl:variable name="nudsGroup" as="element()*">
+						<nudsGroup>
+							<!-- get nomisma NUDS documents with get-nuds API -->
+							<xsl:variable name="id-param">
+								<xsl:for-each select="distinct-values(descendant::nuds:typeDesc[contains(@xlink:href, 'nomisma.org')]/@xlink:href)">
+									<xsl:value-of select="substring-after(., 'id/')"/>
+									<xsl:if test="not(position()=last())">
+										<xsl:text>|</xsl:text>
+									</xsl:if>
+								</xsl:for-each>
+							</xsl:variable>
+
+							<xsl:if test="string-length($id-param) &gt; 0">
+								<xsl:for-each select="document(concat('http://nomisma.org/get-nuds?id=', $id-param))//nuds:nuds">
+									<object xlink:href="http://nomisma.org/id/{nuds:nudsHeader/nuds:nudsid}">
+										<xsl:copy-of select="."/>
+									</object>
+								</xsl:for-each>
+							</xsl:if>
+
+							<!-- incorporate other typeDescs which do not point to nomisma.org -->
+							<xsl:for-each select="descendant::nuds:typeDesc[not(contains(@xlink:href, 'nomisma.org'))]">
+								<xsl:choose>
+									<xsl:when test="string(@xlink:href)">
+										<xsl:if test="boolean(document(concat(@xlink:href, '.xml')))">
+											<object xlink:href="{@xlink:href}">
+												<xsl:copy-of select="document(concat(@xlink:href, '.xml'))/nuds:nuds"/>
+											</object>
+										</xsl:if>
+									</xsl:when>
+									<xsl:otherwise>
+										<object>
+											<xsl:copy-of select="."/>
+										</object>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:for-each>
+						</nudsGroup>
+					</xsl:variable>
+
+					<!-- get date values for closing date -->
+					<xsl:variable name="dates" as="element()*">
+						<dates>
+							<xsl:for-each select="distinct-values($nudsGroup/descendant::nuds:typeDesc/descendant::*/@standardDate)">
+								<xsl:sort data-type="number"/>
+								<xsl:if test="number(.)">
+									<date>
+										<xsl:value-of select="number(.)"/>
+									</date>
+								</xsl:if>
+							</xsl:for-each>
+						</dates>
+					</xsl:variable>					
+					<xsl:if test="count($dates//date) &gt; 0">
+						<nm:closing_date rdf:datatype="xs:gYear">
+							<xsl:value-of select="format-number($dates//date[last()], '0000')"/>
+						</nm:closing_date>
+					</xsl:if>
+				</xsl:when>
+				<xsl:otherwise>
+					
+				</xsl:otherwise>
+			</xsl:choose>
+
+
 			<xsl:for-each select="descendant::nuds:typeDesc/@xlink:href|descendant::nuds:undertypeDesc/@xlink:href">
 				<nm:type_series_item rdf:resource="{.}"/>
 			</xsl:for-each>
-		</rdf:Description>
+		</nm:hoard>
 	</xsl:template>
 
 	<!-- ************** SOLR-TO-XML **************** -->
@@ -529,8 +642,10 @@
 		<xsl:variable name="id" select="str[@name='id']"/>
 		<xsl:variable name="recordType" select="str[@name='recordType']"/>
 
-		<rdf:Description rdf:about="{$url}id/{$id}">
-			<dcterms:title>
+		<xsl:element name="nm:{if($recordType='hoard') then 'hoard' else 'coin'}">
+			<xsl:attribute name="rdf:about" select="concat($url, 'id/', $id)"/>
+
+			<dcterms:title xml:lang="{if (str[@name='lang']) then str[@name='lang'] else 'en'}">
 				<xsl:value-of select="str[@name='title_display']"/>
 			</dcterms:title>
 			<dcterms:identifier>
@@ -542,7 +657,6 @@
 			<xsl:for-each select="arr[@name='coinType_uri']/str">
 				<nm:type_series_item rdf:resource="{.}"/>
 			</xsl:for-each>
-			<nm:numismatic_term rdf:resource="http://nomisma.org/id/{if($recordType='coin') then 'coin' else 'hoard'}"/>
 			<!-- measurements for physical coins -->
 			<xsl:if test="int[@name='axis_num']">
 				<nm:axis rdf:datatype="xs:integer">
@@ -561,9 +675,9 @@
 			</xsl:if>
 			<!-- findspot information -->
 			<xsl:if test="int[@name='taq_num']">
-				<nm:approximateburialdate rdf:datatype="xs:gYear">
+				<nm:closing_date rdf:datatype="xs:gYear">
 					<xsl:value-of select="format-number(int[@name='taq_num'], '0000')"/>
-				</nm:approximateburialdate>
+				</nm:closing_date>
 			</xsl:if>
 			<xsl:choose>
 				<xsl:when test="string(arr[@name='findspot_uri']/str)">
@@ -577,18 +691,61 @@
 			</xsl:choose>
 			<!-- images -->
 			<xsl:if test="string(str[@name='thumbnail_obv'])">
-				<nm:obverseThumbnail rdf:resource="str[@name='thumbnail_obv']"/>
+				<xsl:variable name="href">
+					<xsl:choose>
+						<xsl:when test="contains(str[@name='thumbnail_obv'], 'http://')">
+							<xsl:value-of select="str[@name='thumbnail_obv']"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="concat($url, str[@name='thumbnail_obv'])"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+
+				<nm:obverseThumbnail rdf:resource="{$href}"/>
 			</xsl:if>
 			<xsl:if test="string(str[@name='reference_obv'])">
-				<nm:obverseReference rdf:resource="str[@name='reference_obv']"/>
+				<xsl:variable name="href">
+					<xsl:choose>
+						<xsl:when test="contains(str[@name='reference_obv'], 'http://')">
+							<xsl:value-of select="str[@name='reference_obv']"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="concat($url, str[@name='reference_obv'])"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+
+				<nm:obverseReference rdf:resource="{$href}"/>
 			</xsl:if>
 			<xsl:if test="string(str[@name='thumbnail_rev'])">
-				<nm:reverseThumbnail rdf:resource="str[@name='thumbnail_rev']"/>
+				<xsl:variable name="href">
+					<xsl:choose>
+						<xsl:when test="contains(str[@name='thumbnail_rev'], 'http://')">
+							<xsl:value-of select="str[@name='thumbnail_rev']"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="concat($url, str[@name='thumbnail_rev'])"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+
+				<nm:reverseThumbnail rdf:resource="{$href}"/>
 			</xsl:if>
 			<xsl:if test="string(str[@name='reference_rev'])">
-				<nm:reverseReference rdf:resource="str[@name='reference_rev']"/>
-			</xsl:if>
-		</rdf:Description>
-	</xsl:template>
+				<xsl:variable name="href">
+					<xsl:choose>
+						<xsl:when test="contains(str[@name='reference_rev'], 'http://')">
+							<xsl:value-of select="str[@name='reference_rev']"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="concat($url, str[@name='reference_rev'])"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
 
+				<nm:reverseReference rdf:resource="{$href}"/>
+			</xsl:if>
+		</xsl:element>
+	</xsl:template>
 </xsl:stylesheet>
