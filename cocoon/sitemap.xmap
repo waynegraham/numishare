@@ -223,7 +223,7 @@
 					<map:parameter name="id" value="{1}"/>
 				</map:transform>
 				<map:transform type="cinclude"/>
-				<map:serialize type="xml"/>
+				<map:serialize type="kml"/>
 			</map:match>
 
 			<map:match pattern="id/*">
