@@ -41,16 +41,16 @@ for example pulling data from the coin-type triplestore and SPARQL endpoint, Met
 
 	<xsl:template name="numishare:associatedObjects">
 		<xsl:variable name="query">
-			<![CDATA[PREFIX oac:      <http://www.openannotation.org/ns/>
+			<![CDATA[ 
 			PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 			PREFIX dcterms:  <http://purl.org/dc/terms/>
 			PREFIX nm:       <http://nomisma.org/id/>
 			
-			SELECT ?annotation ?uri ?title ?publisher ?weight ?axis ?diameter ?obvThumb ?revThumb ?obvRef ?revRef ?findspot ?numismatic_term  WHERE {
-			?annotation oac:hasBody <typeUri>.
-			?annotation oac:hasTarget ?uri .
+			SELECT ?annotation ?uri ?title ?publisher ?collection ?weight ?axis ?diameter ?obvThumb ?revThumb ?obvRef ?revRef ?findspot  WHERE {
+			?annotation nm:type_series_item <typeUri>.
 			?annotation dcterms:title ?title .
 			?annotation dcterms:publisher ?publisher .
+			OPTIONAL { ?annotation nm:collection ?collection } .
 			OPTIONAL { ?annotation nm:weight ?weight }
 			OPTIONAL { ?annotation nm:axis ?axis }
 			OPTIONAL { ?annotation nm:diameter ?diameter }
@@ -69,19 +69,18 @@ for example pulling data from the coin-type triplestore and SPARQL endpoint, Met
 
 	<xsl:template name="numishare:getFindspots">
 		<xsl:variable name="query">
-			<![CDATA[PREFIX oac:      <http://www.openannotation.org/ns/>
+			<![CDATA[
 			PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 			PREFIX dcterms:  <http://purl.org/dc/terms/>
 			PREFIX nm:       <http://nomisma.org/id/>
 			
 			SELECT ?annotation ?uri ?title ?publisher ?findspot ?numismatic_term ?burial WHERE {
-			?annotation oac:hasBody <typeUri>.
-			?annotation oac:hasTarget ?uri .
+			?annotation nm:type_series_item <typeUri>.
 			?annotation dcterms:title ?title .
 			?annotation dcterms:publisher ?publisher .
 			?annotation nm:findspot ?findspot .
 			OPTIONAL { ?annotation nm:numismatic_term ?numismatic_term }
-			OPTIONAL { ?annotation nm:approximateburialdate ?burial }}]]>
+			OPTIONAL { ?annotation nm:closing_date ?burial }}]]>
 		</xsl:variable>
 		<xsl:variable name="service" select="concat($endpoint, '?query=', encode-for-uri(normalize-space(replace($query, 'typeUri', $uri))), '&amp;output=xml')"/>
 
@@ -90,19 +89,18 @@ for example pulling data from the coin-type triplestore and SPARQL endpoint, Met
 	
 	<xsl:template name="numishare:getJsonFindspots">
 		<xsl:variable name="query">
-			<![CDATA[PREFIX oac:      <http://www.openannotation.org/ns/>
+			<![CDATA[
 			PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 			PREFIX dcterms:  <http://purl.org/dc/terms/>
 			PREFIX nm:       <http://nomisma.org/id/>
 			
 			SELECT ?annotation ?uri ?title ?publisher ?findspot ?numismatic_term ?burial WHERE {
-			?annotation oac:hasBody <typeUri>.
-			?annotation oac:hasTarget ?uri .
+			?annotation nm:type_series_item <typeUri>.
 			?annotation dcterms:title ?title .
 			?annotation dcterms:publisher ?publisher .
 			?annotation nm:findspot ?findspot .
 			OPTIONAL { ?annotation nm:numismatic_term ?numismatic_term }
-			OPTIONAL { ?annotation nm:approximateburialdate ?burial }}]]>
+			OPTIONAL { ?annotation nm:closing_date ?burial }}]]>
 		</xsl:variable>
 		<xsl:variable name="service" select="concat($endpoint, '?query=', encode-for-uri(normalize-space(replace($query, 'typeUri', $uri))), '&amp;output=xml')"/>
 		
@@ -111,15 +109,15 @@ for example pulling data from the coin-type triplestore and SPARQL endpoint, Met
 
 	<xsl:template name="numishare:getImages">
 		<xsl:variable name="query">
-			<![CDATA[PREFIX oac:      <http://www.openannotation.org/ns/>
+			<![CDATA[ 
 			PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 			PREFIX dcterms:  <http://purl.org/dc/terms/>
 			PREFIX nm:       <http://nomisma.org/id/>
 			
-			SELECT ?annotation ?uri ?publisher ?weight ?axis ?diameter ?obvThumb ?revThumb ?obvRef ?revRef ?findspot ?numismatic_term  WHERE {
-			?annotation oac:hasBody <typeUri>.
-			?annotation oac:hasTarget ?uri .
+			SELECT ?annotation ?uri ?publisher ?collection ?weight ?axis ?diameter ?obvThumb ?revThumb ?obvRef ?revRef ?findspot ?numismatic_term  WHERE {
+			?annotation nm:type_series_item<typeUri>.
 			?annotation dcterms:publisher ?publisher .
+			OPTIONAL { ?annotation nm:collection ?collection } .
 			OPTIONAL { ?annotation nm:weight ?weight }
 			OPTIONAL { ?annotation nm:axis ?axis }
 			OPTIONAL { ?annotation nm:diameter ?diameter }
@@ -141,16 +139,16 @@ for example pulling data from the coin-type triplestore and SPARQL endpoint, Met
 
 	<xsl:template name="numishare:solrFields">
 		<xsl:variable name="query">
-			<![CDATA[PREFIX oac:      <http://www.openannotation.org/ns/>
+			<![CDATA[
 			PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 			PREFIX dcterms:  <http://purl.org/dc/terms/>
 			PREFIX nm:       <http://nomisma.org/id/>
 			
-			SELECT ?annotation ?uri ?title ?publisher ?weight ?axis ?diameter ?obvThumb ?revThumb ?obvRef ?revRef ?findspot ?numismatic_term  WHERE {
-			?annotation oac:hasBody <typeUri>.
-			?annotation oac:hasTarget ?uri .
+			SELECT ?annotation ?uri ?title ?publisher ?collection ?weight ?axis ?diameter ?obvThumb ?revThumb ?obvRef ?revRef ?findspot ?numismatic_term  WHERE {
+			?annotation nm:type_series_item <typeUri>.
 			?annotation dcterms:title ?title .
 			?annotation dcterms:publisher ?publisher .
+			OPTIONAL { ?annotation nm:collection ?collection } .
 			OPTIONAL { ?annotation nm:weight ?weight }
 			OPTIONAL { ?annotation nm:axis ?axis }
 			OPTIONAL { ?annotation nm:diameter ?diameter }
@@ -236,11 +234,11 @@ for example pulling data from the coin-type triplestore and SPARQL endpoint, Met
 				</a>
 			</span>
 			<dl>
-				<xsl:if test="res:binding[@name='publisher']/res:literal">
+				<xsl:if test="res:binding[@name='collection']/res:literal">
 					<div>
-						<dt><xsl:value-of select="numishare:regularize_node('publisher', $lang)"/>: </dt>
+						<dt><xsl:value-of select="numishare:regularize_node('collection', $lang)"/>: </dt>
 						<dd style="margin-left:125px;">
-							<xsl:value-of select="res:binding[@name='publisher']/res:literal"/>
+							<xsl:value-of select="res:binding[@name='collection']/res:literal"/>
 						</dd>
 					</div>
 				</xsl:if>
@@ -370,7 +368,7 @@ for example pulling data from the coin-type triplestore and SPARQL endpoint, Met
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template match="res:binding[@name='findspot']" mode="json">
+	<xsl:template match="res:binding[@name='findspot']" mode="json">		
 		<xsl:variable name="coordinates">
 			<!-- add placemark -->
 			<xsl:choose>

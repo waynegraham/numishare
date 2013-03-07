@@ -428,19 +428,18 @@
 		<xsl:param name="uri"/>
 
 		<xsl:variable name="query">
-			<![CDATA[PREFIX oac:      <http://www.openannotation.org/ns/>
+			<![CDATA[
 			PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 			PREFIX dcterms:  <http://purl.org/dc/terms/>
 			PREFIX nm:       <http://nomisma.org/id/>
 			
 			SELECT ?annotation ?uri ?title ?publisher ?findspot ?numismatic_term ?burial WHERE {
-			?annotation oac:hasBody <typeUri>.
-			?annotation oac:hasTarget ?uri .
+			?annotation nm:type_series_item <typeUri>.
 			?annotation dcterms:title ?title .
 			?annotation dcterms:publisher ?publisher .
 			?annotation nm:findspot ?findspot .
 			OPTIONAL { ?annotation nm:numismatic_term ?numismatic_term }
-			OPTIONAL { ?annotation nm:approximateburialdate ?burial }}]]>
+			OPTIONAL { ?annotation nm:closing_date ?burial }}]]>
 		</xsl:variable>
 		<xsl:variable name="service" select="concat($sparql_endpoint, '?query=', encode-for-uri(normalize-space(replace($query, 'typeUri', $uri))), '&amp;output=xml')"/>
 		<xsl:apply-templates select="document($service)/res:sparql" mode="json"/>
