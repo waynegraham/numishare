@@ -15,7 +15,7 @@ DIRECTIONS: edit the $format, $searchUrl, and $q variables and execute the PHP s
  ************************/
 $format = 'rdf';
 $searchUrl = 'http://localhost:8080/cocoon/numishare/apis/search';
-$q = 'id:ric.1\(2\)*';
+$q = 'id:ric.*';
 $sort = 'timestamp desc';
 $feed = "{$searchUrl}?q={$q}&sort={$sort}&format=atom";
 
