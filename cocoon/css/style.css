@@ -11,10 +11,9 @@ html {
 	background-color:#3383BB;
 }
 body {
-	margin:auto;
-	width:972px;
+	margin:10px 160px;
+	min-width:972px;
 	border:1px solid gray;
-	margin-top:10px;
 	background-color:white;
 	font:14px palatino, serif;
 }
@@ -289,7 +288,6 @@ li.h_item {
 	text-align:right;
 }
 .result_metadata {
-	width:450px;
 	border:0;
 }
 .search_forms {

@@ -6,6 +6,12 @@
 		<!-- if displaying a coin or artifact record, the path to the other sections should be {$display_path} ; otherwise nothing -->
 		<div id="hd">
 			<div class="banner align-right ui-widget-content" style="border:0">
+				<div style="float:left;width:400px;">
+					<form action="{$display_path}results" method="GET" id="qs_form" style="margin:20px 80px">
+						<input type="text" name="q" id="qs_text"/>
+						<input id="qs_button" type="submit" value="{numishare:normalizeLabel('header_search', $lang)}"/>
+					</form>
+				</div>
 				<xsl:if test="string(/content/config/banner_text)">
 					<div class="banner_text">
 						<xsl:value-of select="/content/config/banner_text"/>
@@ -41,7 +47,7 @@
 						</ul>
 					</li>
 				</xsl:if>
-				<xsl:for-each select="//config/pages/page[public = '1']" >
+				<xsl:for-each select="//config/pages/page[public = '1']">
 					<li role="presentation">
 						<a href="{$display_path}pages/{@stub}{if (string($lang)) then concat('?lang=', $lang) else ''}">
 							<xsl:value-of select="short-title"/>
@@ -159,6 +165,6 @@
 				</xsl:if>
 			</xsl:otherwise>
 		</xsl:choose>
-	
+
 	</xsl:template>
 </xsl:stylesheet>
