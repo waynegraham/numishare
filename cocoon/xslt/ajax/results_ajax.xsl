@@ -43,14 +43,11 @@
 					<xsl:variable name="uri" select="concat('http://numismatics.org/ocre/id/', .)"/>
 					<group>
 						<xsl:attribute name="id" select="."/>
-						<xsl:attribute name="coins"
-							select="count($response/descendant::res:result[res:binding[@name='type']/res:uri=$uri and res:binding[@name='numismatic_term']/res:uri='http://nomisma.org/id/coin'])"/>
-						<xsl:attribute name="hoards"
-							select="count($response/descendant::res:result[res:binding[@name='type']/res:uri=$uri and res:binding[@name='numismatic_term']/res:uri='http://nomisma.org/id/hoard'])"/>
-
-						<xsl:copy-of
-							select="$response/descendant::res:result[res:binding[@name='type']/res:uri=$uri and res:binding[@name='numismatic_term']/res:uri='http://nomisma.org/id/coin']"
-						/>
+						<xsl:for-each
+							select="distinct-values($response/descendant::res:result[res:binding[@name='type']/res:uri=$uri]/res:binding[@name='object']/res:uri)">
+							<xsl:variable name="objectUri" select="."/>
+							<xsl:copy-of select="$response/descendant::res:result[res:binding[@name='object']/res:uri=$objectUri][1]"/>
+						</xsl:for-each>
 					</group>
 				</xsl:for-each>
 			</response>
