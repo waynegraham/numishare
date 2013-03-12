@@ -155,7 +155,8 @@ for example pulling data from the coin-type triplestore and SPARQL endpoint, Met
 			OPTIONAL { ?object nm:reverseThumbnail ?revThumb }
 			OPTIONAL { ?object nm:obverseReference ?obvRef }
 			OPTIONAL { ?object nm:reverseReference ?revRef }
-			OPTIONAL { ?object nm:type_series_item ?type }} ]]>
+			OPTIONAL { ?object nm:type_series_item ?type }
+			]]>
 		</xsl:variable>
 		
 		<xsl:variable name="template">
@@ -171,7 +172,25 @@ for example pulling data from the coin-type triplestore and SPARQL endpoint, Met
 			</xsl:for-each>			
 		</xsl:variable>
 		
-		<xsl:variable name="service" select="concat($endpoint, '?query=', encode-for-uri(normalize-space(replace($query, '&lt;typeUris&gt;', $union))), '&amp;output=xml')"/>
+		<xsl:variable name="filter">
+			<xsl:text> FILTER(</xsl:text>
+			<xsl:for-each select="tokenize($identifiers, '\|')">
+				<xsl:variable name="escapedId" select="replace(replace(replace(., '\)', '\\\\)'), '\(', '\\\\('), '\.', '\\\\.')"/>
+				<xsl:text>regex(str(?type), "</xsl:text>
+				<xsl:value-of select="$escapedId"/>
+				<xsl:text>", "i")</xsl:text>
+				<xsl:if test="not(position()=last())">
+					<xsl:text> || </xsl:text>
+				</xsl:if>
+			</xsl:for-each>
+			<xsl:text>)</xsl:text>
+		</xsl:variable>
+		
+		<xsl:variable name="post">
+			<xsl:value-of select="normalize-space(concat(replace($query, '&lt;typeUris&gt;', $union), $filter, '}'))"/>
+		</xsl:variable>
+		
+		<xsl:variable name="service" select="concat($endpoint, '?query=', encode-for-uri($post), '&amp;output=xml')"/>
 		<xsl:copy-of select="document($service)/res:sparql"/>
 	</xsl:template>
 

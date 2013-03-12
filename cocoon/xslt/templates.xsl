@@ -638,9 +638,14 @@
 	<!-- ************** PROCESS GROUP OF SPARQL RESULTS FROM METIS TO DISPLAY IMAGES ************** -->
 	<xsl:template name="numishare:renderSparqlResults">
 		<xsl:param name="group"/>
-		<xsl:variable name="count" select="$group/@hoards + $group/@coins"/>
+		<xsl:variable name="count" select="count($group/descendant::res:result)"/>
+		<xsl:variable name="coin-count" select="count($group/descendant::res:result[contains(res:binding[@name='numismatic_term']/res:uri, 'coin')])"/>
+		<xsl:variable name="hoard-count" select="count($group/descendant::res:result[contains(res:binding[@name='numismatic_term']/res:uri, 'hoard')])"/>
+
+
+		<!--<xsl:variable name="count" select="$group/@hoards + $group/@coins"/>
 		<xsl:variable name="coin-count" select="$group/@coins"/>
-		<xsl:variable name="hoard-count" select="$group/@hoards"/>
+		<xsl:variable name="hoard-count" select="$group/@hoards"/>-->
 
 		<!-- get images -->
 		<xsl:apply-templates select="$group/res:result[res:binding[contains(@name, 'rev') or contains(@name, 'obv')]]" mode="results">
@@ -665,7 +670,7 @@
 		</xsl:if>
 	</xsl:template>
 
-	<xsl:template match="res:result" mode="results">		
+	<xsl:template match="res:result" mode="results">
 		<xsl:variable name="position" select="position()"/>
 		<!-- obverse -->
 		<xsl:choose>
