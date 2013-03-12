@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0" xmlns:nuds="http://nomisma.org/nuds" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:datetime="http://exslt.org/dates-and-times" xmlns:nm="http://nomisma.org/id/"
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exsl="http://exslt.org/common" xmlns:mets="http://www.loc.gov/METS/"
-	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gml="http://www.opengis.net/gml/" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:cinclude="http://apache.org/cocoon/include/1.0"
-	exclude-result-prefixes="#all">
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:res="http://www.w3.org/2005/sparql-results#" xmlns:gml="http://www.opengis.net/gml/" xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:cinclude="http://apache.org/cocoon/include/1.0" exclude-result-prefixes="#all">
 
 	<xsl:template name="nuds">
 		<xsl:apply-templates select="//nuds:nuds"/>
@@ -45,13 +45,35 @@
 			<xsl:apply-templates select="nuds:descMeta"/>
 			<xsl:choose>
 				<xsl:when test="string($sparql_endpoint)">
-					<cinclude:include src="cocoon:/widget?uri={concat('http://numismatics.org/ocre/', 'id/', $id)}&amp;template=solr"/>
+					<!-- get findspots -->
+					<xsl:apply-templates select="$sparqlResult/descendant::res:group[@id=$id]/res:result"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:apply-templates select="nuds:digRep"/>
 				</xsl:otherwise>
 			</xsl:choose>
 		</doc>
+	</xsl:template>
+
+	<xsl:template match="res:result">
+		<xsl:variable name="title" select="res:binding[@name='title']/res:literal"/>
+		<xsl:variable name="uri" select="res:binding[@name='findspot']/res:uri"/>
+
+		<field name="findspot_facet">
+			<xsl:value-of select="$title"/>
+		</field>
+		<xsl:if test="$geonames//place[@id=$uri]">
+			<field name="findspot_uri">
+				<xsl:value-of select="$uri"/>
+			</field>
+			<field name="findspot_geo">
+				<xsl:value-of select="$title"/>
+				<xsl:text>|</xsl:text>
+				<xsl:value-of select="$uri"/>
+				<xsl:text>|</xsl:text>
+				<xsl:value-of select="$geonames//place[@id=$uri]"/>
+			</field>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template match="nuds:descMeta">

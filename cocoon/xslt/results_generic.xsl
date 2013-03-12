@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:numishare="http://code.google.com/p/numishare/"
-	xmlns:cinclude="http://apache.org/cocoon/include/1.0" exclude-result-prefixes="xs cinclude numishare" version="2.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:numishare="http://code.google.com/p/numishare/"  xmlns:res="http://www.w3.org/2005/sparql-results#"
+	xmlns:cinclude="http://apache.org/cocoon/include/1.0" exclude-result-prefixes="#all" version="2.0">
 
 	<xsl:template match="doc">
 		<xsl:variable name="sort_category" select="substring-before($sort, ' ')"/>
@@ -401,7 +401,14 @@
 				<xsl:when test="str[@name='recordType'] = 'conceptual'">
 					<xsl:choose>
 						<xsl:when test="string($sparql_endpoint)">
-							<cinclude:include src="cocoon:/widget?uri=http://numismatics.org/ocre/id/{str[@name='id']}&amp;template=results"/>
+							<xsl:variable name="id" select="str[@name='id']"/>
+							<xsl:variable name="group" as="element()*">
+								<xsl:copy-of select="$sparqlResult//res:group[@id=$id]"/>
+							</xsl:variable>
+							
+							<xsl:call-template name="numishare:renderSparqlResults">
+								<xsl:with-param name="group" select="$group"/>
+							</xsl:call-template>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:variable name="count" select="count(arr[@name='ao_uri']/str)"/>
